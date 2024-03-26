@@ -1,0 +1,20 @@
+{
+    "name": "com-company/yousign-bundle",
+    "description": "Intégration du service de signature Yousign pour Symfony",
+    "type": "symfony-bundle",
+    "autoload": {
+        "psr-4": {
+            "ComCompany\\YousignBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4|>=8.0",
+        "com-company/symfony-contract-signature": "dev-main",
+        "symfony/mime": "*",
+        "ext-json": "*"
+    },
+    "repositories": [{
+        "type": "git",
+        "url": "https://github.com/Com-Company/symfony-contract-signature"
+    }]
+}
