@@ -1,14 +1,15 @@
 <?php
 
 namespace ComCompany\YousignBundle\Service;
-use ComCompany\SignatureContract\DTO\InitiateProcedure;
 use ComCompany\SignatureContract\DTO\Member as BaseMember;
 use ComCompany\SignatureContract\DTO\Document;
 use ComCompany\SignatureContract\DTO\SignatureLocation;
 use ComCompany\SignatureContract\Exception\ApiException;
 use ComCompany\SignatureContract\Exception\ClientException;
 use ComCompany\SignatureContract\Service\SignatureContractInterface;
+use ComCompany\SignatureContract\Response\SignatureResponse;
 use ComCompany\YousignBundle\DTO\InitiateProcedureParams;
+use ComCompany\SignatureContract\DTO\InitiateProcedure;
 use ComCompany\YousignBundle\DTO\Member;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -31,9 +32,9 @@ class ClientYousign implements SignatureContractInterface
         $this->httpClient = $httpClient;
     }
 
-    public function start(array $documents, array $members, ?InitiateProcedure $config): SignatureReponse
+    public function start(array $documents, array $members, ?InitiateProcedure $config = null): SignatureResponse
     {
-        $signature = new SignatureReponse();
+        $signature = new SignatureResponse();
         $idPocedure = $this->initiateProcedure($config);
         $signature->setId($idPocedure);
 
@@ -69,7 +70,7 @@ class ClientYousign implements SignatureContractInterface
 
     }
 
-    public function initiateProcedure(?InitiateProcedureParams $config): string {
+    public function initiateProcedure(?InitiateProcedure $config): string {
         $configData = $config instanceof InitiateProcedureParams
             ? $config->toArray()
             : self::DEFAULT_CONFIG;
@@ -81,19 +82,16 @@ class ClientYousign implements SignatureContractInterface
             $configData['name'] = self::DEFAULT_CONFIG['name'];
         }
 
-        try {
-            $response = $this->request('POST', 'signature_requests', [
-                'body' => json_encode($configData, JSON_THROW_ON_ERROR),
-            ]);
 
-            if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-                throw new ApplicationException('create signature_requests error');
-            }
+        $response = $this->request('POST', 'signature_requests', [
+            'body' => json_encode($configData, JSON_THROW_ON_ERROR),
+        ]);
 
-            return $response['id'];
-        } catch (ApplicationException $e) {
-            throw new ApplicationException('Error initiating signature request: '.$e->getMessage(), 500, $e);
+        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+            throw new ApiException('create signature_requests error', $response->getStatusCode());
         }
+
+        return $response['id'];
     }
 
     public function addSigner(string $procedureId, BaseMember $member): string {
@@ -118,7 +116,7 @@ class ClientYousign implements SignatureContractInterface
 
           $file = new \SplFileInfo($document->path);
           $formData = new FormDataPart([
-              'file' => DataPart::fromPath($file->getPathname(), $document->name, $file->getMimeType()),
+              'file' => DataPart::fromPath($file->getPathname(), $document->name, $document->mimeType),
               'nature' => 'signable_document',
           ]);
           $header = $formData->getPreparedHeaders();
@@ -137,12 +135,12 @@ class ClientYousign implements SignatureContractInterface
 
     public function activate(string $idPocedure): array
     {
-            $response = $this->request('POST', sprintf('signature_requests/%s/activate', $signature->getYousignId()), []);
-            if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-                throw new ApiException('Activate signature error');
-            }
+        $response = $this->request('POST', sprintf('signature_requests/%s/activate', $idPocedure), []);
+        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+            throw new ApiException('Activate signature error', $response->getStatusCode());
+        }
 
-            return $response;
+        return $response;
     }
 
     private function request(string $method, string $url, array $options = [])
@@ -155,7 +153,7 @@ class ClientYousign implements SignatureContractInterface
             }
 
             if (($data = json_decode($response->getContent(false), true)) === null) {
-                throw new ClientException('Error get result');
+                throw new ClientException('Error get result', $response->getStatusCode());
             }
 
             return $data;

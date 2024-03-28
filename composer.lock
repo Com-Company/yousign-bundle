@@ -12,7 +12,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Com-Company/symfony-contract-signature",
-                "reference": "e602eabbd6f9cf6346482f6fdf24d3f0db40081f"
+                "reference": "8a90d2d70f61248ae154361ebdd9696529f65b10"
             },
             "require": {
                 "ext-json": "*",
@@ -27,7 +27,7 @@
                 }
             },
             "description": "Interface pour les components de signature Yousign et Docaposte",
-            "time": "2024-03-26T15:12:19+00:00"
+            "time": "2024-03-28T08:15:35+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
