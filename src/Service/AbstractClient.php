@@ -1,6 +1,7 @@
 <?php
 
 namespace ComCompany\YousignBundle\Service;
+use ComCompany\SignatureContract\DTO\InitiateProcedure;
 use ComCompany\SignatureContract\DTO\Member as BaseMember;
 use ComCompany\SignatureContract\DTO\Document;
 use ComCompany\SignatureContract\DTO\SignatureLocation;
@@ -15,12 +16,11 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function \json_decode;
 
-
 class ClientYousign implements SignatureContractInterface
 {
     const DEFAULT_CONFIG = [
         'delivery_mode' => 'none',
-        'name' => 'Procédure signature',
+        'name' => 'Procédure de signature',
     ];
 
     const DELIVVERY_TYPES = ['mail', 'none'];
@@ -31,7 +31,7 @@ class ClientYousign implements SignatureContractInterface
         $this->httpClient = $httpClient;
     }
 
-    public function start(array $documents, array $members, ?InitiateProcedureParams $config): SignatureReponse
+    public function start(array $documents, array $members, ?InitiateProcedure $config): SignatureReponse
     {
         $signature = new SignatureReponse();
         $idPocedure = $this->initiateProcedure($config);
