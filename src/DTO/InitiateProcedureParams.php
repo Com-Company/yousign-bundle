@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO;
 
-use ComCompany\SignatureContract\DTO\InitiateProcedure;
+use ComCompany\SignatureContract\DTO\ProcedureConfig;
 
-class InitiateProcedureParams extends InitiateProcedure
+class InitiateProcedureConfig extends ProcedureConfig
 {
     public string $deliveryMode;
 
