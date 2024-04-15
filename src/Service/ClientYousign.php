@@ -142,6 +142,20 @@ class ClientYousign implements SignatureContractInterface
           return $responseYousign['id'];
     }
 
+    public function getProcedure(string $procedureId): array {
+        if(!$procedureId) {
+            throw new ClientException('procedureId is required');
+        }
+
+        $uri = 'signature_requests/'.$procedureId;
+        $response = $this->request('GET', $uri);
+
+        if (!is_array($response) || empty($response)) {
+            throw new ApiException('Get procedure error');
+        }
+
+        return $response;
+    }
 
     public function activate(string $idPocedure): array
     {
@@ -152,6 +166,8 @@ class ClientYousign implements SignatureContractInterface
 
         return $response;
     }
+
+
 
     private function request(string $method, string $url, array $options = [])
     {
