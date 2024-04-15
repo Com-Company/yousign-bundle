@@ -4,8 +4,8 @@ namespace ComCompany\YousignBundle\Service;
 use ComCompany\SignatureContract\DTO\Document;
 use ComCompany\SignatureContract\DTO\Member;
 use ComCompany\SignatureContract\DTO\MemberConfig;
-use ComCompany\SignatureContract\DTO\SignatureLocationList;
-use ComCompany\SignatureContract\DTO\SignatureLocation;
+use ComCompany\SignatureContract\DTO\Fields;
+use ComCompany\SignatureContract\DTO\FieldLocation;
 use ComCompany\SignatureContract\Exception\ApiException;
 use ComCompany\SignatureContract\Exception\ClientException;
 use ComCompany\SignatureContract\Service\SignatureContractInterface;
@@ -33,23 +33,23 @@ class ClientYousign implements SignatureContractInterface
         $this->httpClient = $httpClient;
     }
 
-    public function start(SignatureLocationList $signatureLocationList, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
+    public function start(Fields $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
     {
         $signature = new SignatureResponse();
         $procedureId = $this->initiateProcedure($config);
         $signature->setProcedureId($procedureId);
 
         $signers = [];
-        foreach ($signatureLocationList as $signatureLocation) {
-            $document = $signatureLocation->getDocument();
+        foreach ($fields->all() as $field) {
+            $document = $field->getDocument();
             if (!in_array($document, $signature->getDocuments(), true)) {
                 $document->setSupplierId($this->sendDocument($procedureId, $document));
                 $signature->addDocument($document);
             }
 
-            $member = $signatureLocation->getMember();
-            $hash = spl_object_hash($member);
+            $member = $field->getMember();
             $memberInfos = $member->toArray();
+            $hash = md5(print_r($member->toArray(), true));
             if (!isset($signers[$hash])) {
                 $signers[$hash] =
                     new MemberDTO(
@@ -60,11 +60,7 @@ class ClientYousign implements SignatureContractInterface
                         [],
                         $memberConfig);
             }
-            $signers[$hash]->add = [
-                ...$this->formatPosition($signatureLocation->getPosition()),
-                'type' => 'signature',
-                'document_id' => $document->getSupplierId(),
-            ];
+            $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $document->getSupplierId()]));
         }
 
         foreach ($signers as $signer) {
@@ -73,10 +69,17 @@ class ClientYousign implements SignatureContractInterface
             $signature->addMember($signer);
         }
 
-        $this->activate($procedureId);
+        $signatureActivated = $this->activate($procedureId);
 
+        foreach ($signatureActivated['signers'] as $signer) {
+            foreach ($signature->getMembers() as $member) {
+                if ($member->getSupplierId() === $signer['id']) {
+                    $member->setUri($signer['signature_link']);
+                }
+            }
+        }
+        
         return $signature;
-
     }
 
     public function initiateProcedure(?ProcedureConfig $config): string {
@@ -91,7 +94,6 @@ class ClientYousign implements SignatureContractInterface
             $configData['name'] = self::DEFAULT_CONFIG['name'];
         }
 
-
         $response = $this->request('POST', 'signature_requests', [
             'body' => json_encode($configData, JSON_THROW_ON_ERROR),
         ]);
@@ -102,6 +104,7 @@ class ClientYousign implements SignatureContractInterface
 
         return $response['id'];
     }
+
 
     public function sendSigner(string $procedureId, Member $member): string {
         if(!$member instanceof MemberDTO) {
@@ -117,14 +120,14 @@ class ClientYousign implements SignatureContractInterface
             throw new ApiException('Create signer error');
         }
 
-        return $response;
+        return $response['id'];
     }
 
     public function sendDocument(string $procedureId, Document $document): string {
 
-          $file = new \SplFileInfo($document->path);
+          $file = new \SplFileInfo($document->getPath());
           $formData = new FormDataPart([
-              'file' => DataPart::fromPath($file->getPathname(), $document->name, $document->mimeType),
+              'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
               'nature' => 'signable_document',
           ]);
           $header = $formData->getPreparedHeaders();
@@ -167,14 +170,5 @@ class ClientYousign implements SignatureContractInterface
         } catch (TransportExceptionInterface $e) {
             throw new ClientException('Error Processing Request : '.$e->getMessage(), $e->getCode());
         }
-    }
-
-    private function formatPosition(SignatureLocation $location): array
-    {
-        return array_filter(
-            $location->toArray(),
-            static fn($key) => $key !== 'member',
-            ARRAY_FILTER_USE_KEY
-        );
     }
 }
