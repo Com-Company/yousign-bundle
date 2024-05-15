@@ -12,16 +12,17 @@ use ComCompany\SignatureContract\Service\SignatureContractInterface;
 use ComCompany\SignatureContract\Response\SignatureResponse;
 use ComCompany\SignatureContract\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
+use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use function \json_decode;
+use function Safe\json_decode;
+use function Safe\sprintf;
 
 class ClientYousign implements SignatureContractInterface
 {
     const DEFAULT_CONFIG = [
-        'delivery_mode' => 'none',
         'name' => 'Procédure de signature',
     ];
 
@@ -58,12 +59,14 @@ class ClientYousign implements SignatureContractInterface
                         $memberInfos['email'],
                         $memberInfos['phone'],
                         [],
+                        [],
                         $memberConfig);
             }
             $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $document->getSupplierId()]));
         }
 
         foreach ($signers as $signer) {
+
             $idSigner = $this->sendSigner($procedureId, $signer);
             $signer->setSupplierId($idSigner);
             $signature->addMember($signer);
@@ -82,30 +85,22 @@ class ClientYousign implements SignatureContractInterface
         return $signature;
     }
 
-    public function initiateProcedure(?ProcedureConfig $config): string {
-        $configData = $config instanceof ProcedureConfig
+    public function initiateProcedure(ProcedureConfig $config = null): string {
+        $configData = $config instanceof ProcedureConfigYousign
             ? $config->toArray()
             : self::DEFAULT_CONFIG;
-
-        if (!in_array($config->deliveryMode, self::DELIVVERY_TYPES)) {
-            throw new \InvalidArgumentException('delivery_mode must be one of: '.implode(', ', self::DELIVVERY_TYPES));
-        }
-        if (empty($configData->name)) {
-            $configData['name'] = self::DEFAULT_CONFIG['name'];
-        }
-
+        
         $response = $this->request('POST', 'signature_requests', [
             'body' => json_encode($configData, JSON_THROW_ON_ERROR),
         ]);
 
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-            throw new ApiException('create signature_requests error', $response->getStatusCode());
+            throw new ApiException('create signature_requests error', 500);
         }
 
         return $response['id'];
     }
-
-
+    
     public function sendSigner(string $procedureId, Member $member): string {
         if(!$member instanceof MemberDTO) {
             throw new ClientException('Error when adding signer');
@@ -157,18 +152,67 @@ class ClientYousign implements SignatureContractInterface
         return $response;
     }
 
+    /**
+     * @param string $idPocedure
+     * @return array<string, mixed>
+     */
     public function activate(string $idPocedure): array
     {
         $response = $this->request('POST', sprintf('signature_requests/%s/activate', $idPocedure), []);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-            throw new ApiException('Activate signature error', $response->getStatusCode());
+            throw new ApiException('Activate signature error', 500);
         }
 
         return $response;
     }
 
+    /**
+     * @param string $procedureId
+     * @param string $documentId
+     * @return array<mixed, mixed>|string
+     */
+    public function downloadDocument(string $procedureId, string $documentId) {
+        if (!$procedureId) {
+            throw new ClientException('procedureId is required');
+        }
 
+        if (!$documentId) {
+            throw new ClientException('documentId is required');
+        }
 
+        $response = $this->httpClient->request('GET', sprintf('signature_requests/%s/documents/%s/download', $procedureId, $documentId), []);
+
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
+        }
+
+        return $response->getContent(false);
+    }
+
+    public function getSignerAuditTrail(string $procedureId, string $signerId) {
+        if (!$procedureId) {
+            throw new ClientException('procedureId is required');
+        }
+
+        if (!$signerId) {
+            throw new ClientException('signerId is required');
+        }
+
+        $response = $this->httpClient->request('GET', sprintf('signature_requests/%s/signers/%s/audit_trails/download', $procedureId, $signerId), []);
+
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
+        }
+
+        return $response->getContent(false);
+    }
+
+    /**
+     * @param string $method
+     * @param string $url
+     * @param array<string, mixed> $options
+     * @return array<mixed, mixed>|string
+     */
     private function request(string $method, string $url, array $options = [])
     {
         try {
@@ -184,7 +228,7 @@ class ClientYousign implements SignatureContractInterface
 
             return $data;
         } catch (TransportExceptionInterface $e) {
-            throw new ClientException('Error Processing Request : '.$e->getMessage(), $e->getCode());
+            throw new ApiException('Error Processing Request : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 }
