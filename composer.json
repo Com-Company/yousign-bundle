@@ -9,7 +9,7 @@
     },
     "require": {
         "php": ">=7.4|>=8.0",
-        "com-company/symfony-contract-signature": "0.0.4.1",
+        "com-company/symfony-contract-signature": "dev-main",
         "symfony/mime": "*",
         "ext-json": "*"
     },
