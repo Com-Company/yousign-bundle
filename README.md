@@ -47,7 +47,10 @@ $ composer require com-company/symfony-signature-interface
         alias: 'ComCompany\YousignBundle\Service\ClientYousign'
 
 ### 4. Déclarer les paramètres de connexion à Yousign dans votre fichier .env
-
-YOUSIGN_V3_URI='https://api-sandbox.yousign.app/v3/' dev ou 'https://api.yousign.app/v3/' prod 
+```bash
+YOUSIGN_V3_URI='https://api-sandbox.yousign.app/v3/' dev ou 'https://api.yousign.app/v3/' prod
+ 
 YOUSIGN_V3_TOKEN='token_yousign_v3'
+
 YOUSIGN_V3_WORKSPACE_ID='workspace_id_de_votre_application'
+```
