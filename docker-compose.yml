@@ -1,0 +1,17 @@
+version: "3"
+services:
+  php:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - "UID=${UID:-1000}"
+    working_dir: /var/www/html/
+    networks:
+      - backend
+    volumes:
+      - ./:/var/www/html
+
+networks:
+  backend:
+    external: true

@@ -19,16 +19,14 @@ class ProcedureConfig extends SignatureContractProcedureConfig
     public function __construct(
         string $name,
         string $externalId,
-        string $deliveryMode = 'none',
-        bool $signersAllowedToDecline = false,
-        string $auditTrailLocale = 'fr',
-        string $workspaceId = null
+        bool $start = false,
+        string $workspaceId = null,
+        bool $allowWebhook = true,
     ) {
         parent::__construct($name, $externalId);
         $this->deliveryMode = $deliveryMode;
         $this->workspaceId = $workspaceId;
         $this->signersAllowedToDecline = $signersAllowedToDecline;
-        $this->auditTrailLocale = $auditTrailLocale;
     }
 
     public function toArray(): array
@@ -36,10 +34,10 @@ class ProcedureConfig extends SignatureContractProcedureConfig
         return [
             'name' => $this->name,
             'external_id' => $this->externalId,
-            'delivery_mode' => $this->deliveryMode,
+            'delivery_mode' => 'none',
             'workspace_id' => $this->workspaceId,
-            'signers_allowed_to_decline' => $this->signersAllowedToDecline,
-            'audit_trail_locale' => $this->auditTrailLocale,
+            'signers_allowed_to_decline' => true,
+            'audit_trail_locale' => 'fr',
         ];
     }
 }

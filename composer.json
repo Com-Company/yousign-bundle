@@ -7,11 +7,20 @@
             "ComCompany\\YousignBundle\\": "src/"
         }
     },
+    "config": {
+        "cache-dir": "./.cache"
+    },
     "require": {
         "php": ">=7.4|>=8.0",
         "com-company/symfony-contract-signature": "dev-main",
         "symfony/mime": "*",
         "ext-json": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpstan/phpstan": "1.7.*",
+        "thecodingmachine/phpstan-safe-rule": "^1.0",
+        "thecodingmachine/phpstan-strict-rules": "^1.0"
     },
     "repositories": [{
         "type": "git",
