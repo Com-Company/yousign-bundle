@@ -1,0 +1,33 @@
+services:
+    yousign_bundle.v3_client:
+        class: 'Symfony\Component\HttpClient\HttpClient'
+        factory: [ 'Symfony\Component\HttpClient\HttpClient', 'create' ]
+        arguments:
+            $defaultOptions:
+                headers:
+                    content-type: 'application/json'
+                    Authorization: 'Bearer %env(resolve:YOUSIGN_V3_TOKEN, "default")%'
+                base_uri: '%env(resolve:YOUSIGN_V3_URI, "default")%'
+
+    yousign_bundle.v2_client:
+        class: 'Symfony\Component\HttpClient\HttpClient'
+        factory: [ 'Symfony\Component\HttpClient\HttpClient', 'create' ]
+        arguments:
+            $defaultOptions:
+                headers:
+                    content-type: 'application/json'
+                    Authorization: 'Bearer %env(resolve:YOUSIGN_V2_TOKEN, "default")%'
+                base_uri: '%env(resolve:YOUSIGN_V2_URI, "default")%'
+
+    ComCompany\YousignBundle\Service\YousignV3\ClientYousign:
+        public: false
+        autowire: true
+        arguments:
+            $httpClient: '@yousign_bundle.v3_client'
+
+    ComCompany\YousignBundle\Service\YousignV2\ClientYousign:
+        public: false
+        autowire: true
+        arguments:
+            $httpClient: '@yousign_bundle.v2_client'
+

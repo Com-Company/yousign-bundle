@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO;
+
 use ComCompany\SignatureContract\DTO\MemberConfig as MemberConfigBase;
 
 class MemberConfig extends MemberConfigBase
@@ -13,7 +14,8 @@ class MemberConfig extends MemberConfigBase
     }
 
     /** @return array<string, mixed> */
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return get_object_vars($this);
     }
 }
