@@ -1,0 +1,5 @@
+yousignv3_webkhook:
+  path: /api/yousign-bindle/{version}/{type}/{req}
+  controller: ComCompany\YousignBundle\Controller\Webhook
+  requirements:
+    req: ".+"

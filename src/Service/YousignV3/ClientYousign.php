@@ -9,6 +9,8 @@ use ComCompany\SignatureContract\DTO\MemberConfig;
 use ComCompany\SignatureContract\DTO\ProcedureConfig;
 use ComCompany\SignatureContract\Exception\ApiException;
 use ComCompany\SignatureContract\Exception\ClientException;
+use ComCompany\SignatureContract\Response\DocumentResponse;
+use ComCompany\SignatureContract\Response\MemberResponse;
 use ComCompany\SignatureContract\Response\SignatureResponse;
 use ComCompany\SignatureContract\Service\SignatureContractInterface;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
@@ -44,8 +46,12 @@ class ClientYousign implements SignatureContractInterface
         foreach ($fields->all() as $field) {
             $document = $field->getDocument();
             if (!in_array($document, $signature->getDocuments(), true)) {
-                $document->setSupplierId($this->sendDocument($procedureId, $document));
-                $signature->addDocument($document);
+                $documenResponse = new DocumentResponse(
+                    $document->getId(),
+                    $this->sendDocument($procedureId, $document),
+                    'signable_document'
+                );
+                $signature->addDocument($documenResponse);
             }
 
             $member = $field->getMember();
@@ -54,6 +60,7 @@ class ClientYousign implements SignatureContractInterface
             if (!isset($signers[$hash])) {
                 $signers[$hash] =
                     new MemberDTO(
+                        $memberInfos['id'],
                         $memberInfos['firstName'],
                         $memberInfos['lastName'],
                         $memberInfos['email'],
@@ -65,18 +72,24 @@ class ClientYousign implements SignatureContractInterface
             $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $document->getSupplierId()]));
         }
 
+        $members = [];
         foreach ($signers as $signer) {
             $idSigner = $this->sendSigner($procedureId, $signer);
-            $signer->setSupplierId($idSigner);
-            $signature->addMember($signer);
+            $members[$idSigner] = $signer;
         }
 
         $signatureActivated = $this->activate($procedureId);
+        foreach ($members as $idSigner => $originalSigner) {
+            foreach ($signatureActivated->getMembers() as $signer) {
+                if ($idSigner === $signer->getSupplierId()) {
+                    $memberResponse = new MemberResponse(
+                        $originalSigner->getId(),
+                        $idSigner,
+                        'pending',
+                        $signer->getUri()
+                    );
 
-        foreach ($signatureActivated['signers'] as $signer) {
-            foreach ($signature->getMembers() as $member) {
-                if ($member->getSupplierId() === $signer['id']) {
-                    $member->setUri($signer['signature_link']);
+                    $signature->addMember($memberResponse);
                 }
             }
         }
@@ -138,39 +151,65 @@ class ClientYousign implements SignatureContractInterface
         return $responseYousign['id'];
     }
 
-    public function getProcedure(string $procedureId): array
+    public function getProcedure(string $procedureId): SignatureResponse
     {
         if (!$procedureId) {
             throw new ClientException('procedureId is required');
         }
 
-        $uri = 'signature_requests/'.$procedureId;
-        $response = $this->request('GET', $uri);
+        $response = $this->request('GET', sprintf('signature_requests/%s', $procedureId));
 
         if (!is_array($response) || empty($response)) {
             throw new ApiException('Get procedure error');
         }
 
-        return $response;
+        $signatureResponse = new SignatureResponse();
+        $signatureResponse->setProcedureId($response['id']);
+        $signatureResponse->setCreationDate($response['created_at']);
+        $signatureResponse->setExpirationDate($response['expiration_date']);
+        $signatureResponse->setWorkspaceId($response['workspace_id']);
+
+        foreach ($response['documents'] as $document) {
+            $signatureResponse->addDocument(new DocumentResponse(null, $document['id'], $document['nature']));
+        }
+
+        $signers = $this->request('GET', sprintf('signature_requests/%s/signers', $procedureId));
+        if (is_array($signers) && !empty($signers)) {
+            foreach ($signers as $signer) {
+                $signatureResponse->addMember(new MemberResponse(null, $signer['id'], $signer['status'], $signer['signature_link']));
+            }
+        }
+
+        return $signatureResponse;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function activate(string $idPocedure): array
+    public function activate(string $procedureId): SignatureResponse
     {
-        $response = $this->request('POST', sprintf('signature_requests/%s/activate', $idPocedure), []);
+        $response = $this->request('POST', sprintf('signature_requests/%s/activate', $procedureId), []);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Activate signature error', 500);
         }
 
-        return $response;
+        $signatureResponse = new SignatureResponse();
+        $signatureResponse->setProcedureId($response['id']);
+        $signatureResponse->setCreationDate($response['created_at']);
+        $signatureResponse->setExpirationDate($response['expiration_date']);
+        $signatureResponse->setWorkspaceId($response['workspace_id']);
+
+        foreach ($response['documents'] as $document) {
+            $signatureResponse->addDocument(new DocumentResponse(null, $document['id'], $document['nature']));
+        }
+
+        if (is_array($response['signers']) && !empty($response['signers'])) {
+            foreach ($response['signers'] as $signer) {
+                $signatureResponse->addMember(new MemberResponse(null, $signer['id'], $signer['status'], $signer['signature_link']));
+            }
+        }
+
+        return new SignatureResponse();
     }
 
-    /**
-     * @return array<mixed, mixed>|string
-     */
-    public function downloadDocument(string $procedureId, string $documentId)
+    public function downloadDocument(string $procedureId, string $documentId): string
     {
         if (!$procedureId) {
             throw new ClientException('procedureId is required');
@@ -208,17 +247,12 @@ class ClientYousign implements SignatureContractInterface
         return $response->getContent(false);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function deleteProcedure(string $procedureId): array
+    public function deleteProcedure(string $procedureId): void
     {
         $response = $this->request('POST', sprintf('signature_requests/%s/cancel', $procedureId), []);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
-
-        return $response;
     }
 
     /**

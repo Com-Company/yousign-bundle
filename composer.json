@@ -11,10 +11,20 @@
         "cache-dir": "./.cache"
     },
     "require": {
+        "ext-json": "*",
         "php": ">=7.4|>=8.0",
         "com-company/symfony-contract-signature": "dev-main",
+        "symfony/config": "*",
         "symfony/mime": "*",
-        "ext-json": "*"
+        "symfony/dependency-injection": "*",
+        "symfony/http-foundation": "^5.4",
+        "symfony/http-kernel": "^5.4"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpstan/phpstan": "1.7.*",
+        "thecodingmachine/phpstan-safe-rule": "^1.0",
+        "thecodingmachine/phpstan-strict-rules": "^1.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",

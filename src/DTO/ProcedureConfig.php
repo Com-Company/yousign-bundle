@@ -8,25 +8,15 @@ use ComCompany\SignatureContract\DTO\ProcedureConfig as SignatureContractProcedu
 
 class ProcedureConfig extends SignatureContractProcedureConfig
 {
-    public string $deliveryMode;
-
-    public string $auditTrailLocale;
-
     public ?string $workspaceId;
-
-    public bool $signersAllowedToDecline;
 
     public function __construct(
         string $name,
         string $externalId,
-        bool $start = false,
-        string $workspaceId = null,
-        bool $allowWebhook = true,
+        ?string $workspaceId = null
     ) {
         parent::__construct($name, $externalId);
-        $this->deliveryMode = $deliveryMode;
         $this->workspaceId = $workspaceId;
-        $this->signersAllowedToDecline = $signersAllowedToDecline;
     }
 
     public function toArray(): array
