@@ -55,7 +55,7 @@ class ClientYousign implements SignatureContractInterface
      * @throws ClientException
      * @throws ApiException|StringsException
      */
-    public function getProcedure(string $procedureId): array
+    public function getProcedure(string $procedureId): SignatureResponse
     {
         if (!$procedureId) {
             throw new ClientException('procedureId is required');
@@ -67,26 +67,18 @@ class ClientYousign implements SignatureContractInterface
             throw new ApiException('Get procedure error');
         }
 
-        return $response;
+        return new SignatureResponse();
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function activate(string $idPocedure): array
+    public function activate(string $idProcedure): void
     {
-        $response = $this->request('PUT', sprintf('procedures/%s', $idPocedure), ['json' => ['start' => true]]);
+        $response = $this->request('PUT', sprintf('procedures/%s', $idProcedure), ['json' => ['start' => true]]);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Activate signature error', 500);
         }
-
-        return $response;
     }
 
-    /**
-     * @return array<mixed, mixed>|string
-     */
-    public function downloadDocument(string $procedureId, string $documentId)
+    public function downloadDocument(string $procedureId, string $documentId): string
     {
         if (!$procedureId) {
             throw new ClientException('procedureId is required');
@@ -124,17 +116,12 @@ class ClientYousign implements SignatureContractInterface
         return $response->getContent(false);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function deleteProcedure(string $procedureId): array
+    public function deleteProcedure(string $procedureId): void
     {
         $response = $this->request('DELETE', sprintf('procedures/%s', $procedureId), []);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
-
-        return $response;
     }
 
     /**

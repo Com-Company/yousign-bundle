@@ -12,8 +12,10 @@ class Member extends BaseMember
 
     /**
      * @param array<int, array<string, mixed>> $fields
+     * @param array<string, mixed>             $additional
      */
     public function __construct(
+        string $id,
         string $firstName,
         string $lastName,
         string $email,
@@ -22,7 +24,7 @@ class Member extends BaseMember
         array $additional = [],
         ?BaseMemberConfig $config = null
     ) {
-        parent::__construct($firstName, $lastName, $email, $phone, $additional, $config);
+        parent::__construct($id, $firstName, $lastName, $email, $phone, $additional, $config);
         $this->fields = $fields;
     }
 
