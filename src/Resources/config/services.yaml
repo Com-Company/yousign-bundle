@@ -1,4 +1,24 @@
 services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        public: false
+        bind:
+            $webhookParsers: !tagged_iterator 'yousign.webhook_parser'
+
+    _instanceof:
+        ComCompany\YousignBundle\Service\WebhookParserInterface:
+            tags: [ name: 'yousign.webhook_parser' ]
+
+    ComCompany\YousignBundle\:
+        resource: '../../'
+        exclude:
+            - '../../DTO/'
+
+    ComCompany\YousignBundle\Controller\:
+        resource: '../../Controller/'
+        tags: [ 'controller.service_arguments' ]
+
     yousign_bundle.v3_client:
         class: 'Symfony\Component\HttpClient\HttpClient'
         factory: [ 'Symfony\Component\HttpClient\HttpClient', 'create' ]
@@ -20,14 +40,9 @@ services:
                 base_uri: '%yousign_v2_uri%'
 
     ComCompany\YousignBundle\Service\YousignV3\ClientYousign:
-        public: false
-        autowire: true
         arguments:
             $httpClient: '@yousign_bundle.v3_client'
 
     ComCompany\YousignBundle\Service\YousignV2\ClientYousign:
-        public: false
-        autowire: true
         arguments:
             $httpClient: '@yousign_bundle.v2_client'
-
