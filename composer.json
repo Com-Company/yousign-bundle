@@ -14,7 +14,8 @@
         "php": ">=7.4|>=8.0",
         "com-company/symfony-contract-signature": "dev-main",
         "symfony/mime": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "symfony/http-foundation": "^5.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
