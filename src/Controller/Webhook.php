@@ -2,6 +2,7 @@
 
 namespace ComCompany\YousignBundle\Controller;
 
+use App\Exception\ApplicationException;
 use App\Exception\JsonRequestException;
 use App\Manager\Webhook\Yousign;
 use ComCompany\YousignBundle\Service\YousignV3\WebhookManager;
