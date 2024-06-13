@@ -108,7 +108,6 @@ class ClientYousign implements SignatureContractInterface
         }
 
         $response = $this->httpClient->request('GET', sprintf('%s/proof?format=pdf', $signerId), []);
-
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing getProof: '.$response->getContent(false), $response->getStatusCode());
         }
@@ -122,6 +121,19 @@ class ClientYousign implements SignatureContractInterface
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
+    }
+
+    public function archiveDocument(string $fileName, string $content): string
+    {
+        $response = $this->request('POST', 'archives', ['json' => [
+            'fileName' => $fileName,
+            'content' => $content,
+        ]]);
+        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+            throw new ApiException('Archive Document error', 500);
+        }
+
+        return $response['id'];
     }
 
     /**
