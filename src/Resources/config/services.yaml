@@ -6,8 +6,8 @@ services:
             $defaultOptions:
                 headers:
                     content-type: 'application/json'
-                    Authorization: 'Bearer %env(resolve:YOUSIGN_V3_TOKEN, "default")%'
-                base_uri: '%env(resolve:YOUSIGN_V3_URI, "default")%'
+                    Authorization: 'Bearer %yousign_v3_token%'
+                base_uri: '%yousign_v3_uri%'
 
     yousign_bundle.v2_client:
         class: 'Symfony\Component\HttpClient\HttpClient'
@@ -16,8 +16,8 @@ services:
             $defaultOptions:
                 headers:
                     content-type: 'application/json'
-                    Authorization: 'Bearer %env(resolve:YOUSIGN_V2_TOKEN, "default")%'
-                base_uri: '%env(resolve:YOUSIGN_V2_URI, "default")%'
+                    Authorization: 'Bearer %yousign_v2_token%'
+                base_uri: '%yousign_v2_uri%'
 
     ComCompany\YousignBundle\Service\YousignV3\ClientYousign:
         public: false

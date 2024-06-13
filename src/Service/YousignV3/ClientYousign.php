@@ -45,10 +45,12 @@ class ClientYousign implements SignatureContractInterface
         $signers = [];
         foreach ($fields->all() as $field) {
             $document = $field->getDocument();
+            $supplierId = null;
             if (!in_array($document, $signature->getDocuments(), true)) {
+                $supplierId = $this->sendDocument($procedureId, $document);
                 $documenResponse = new DocumentResponse(
                     $document->getId(),
-                    $this->sendDocument($procedureId, $document),
+                    $supplierId,
                     'signable_document'
                 );
                 $signature->addDocument($documenResponse);
@@ -69,7 +71,7 @@ class ClientYousign implements SignatureContractInterface
                         [],
                         $memberConfig);
             }
-            $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $document->getSupplierId()]));
+            $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $supplierId]));
         }
 
         $members = [];
@@ -206,7 +208,7 @@ class ClientYousign implements SignatureContractInterface
             }
         }
 
-        return new SignatureResponse();
+        return $signatureResponse;
     }
 
     public function downloadDocument(string $procedureId, string $documentId): string
@@ -266,7 +268,7 @@ class ClientYousign implements SignatureContractInterface
             $response = $this->httpClient->request($method, $url, $options);
 
             if (300 <= $response->getStatusCode()) {
-                throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
+                throw new ApiException($response->getContent(false), $response->getStatusCode());
             }
 
             if (($data = json_decode($response->getContent(false), true)) === null) {
@@ -275,7 +277,7 @@ class ClientYousign implements SignatureContractInterface
 
             return $data;
         } catch (TransportExceptionInterface $e) {
-            throw new ApiException('Error Processing Request : '.$e->getMessage(), $e->getCode(), $e);
+            throw new ApiException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }
