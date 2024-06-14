@@ -1,3 +1,3 @@
 webhook:
-  path: /webhook
+  path: /webhook/{version}
   controller: ComCompany\YousignBundle\Controller\Webhook

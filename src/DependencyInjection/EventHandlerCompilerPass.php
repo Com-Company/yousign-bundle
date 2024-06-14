@@ -2,7 +2,7 @@
 
 namespace ComCompany\YousignBundle\DependencyInjection;
 
-use ComCompany\YousignBundle\Service\YousignV3\WebhookManager;
+use ComCompany\YousignBundle\Service\WebhookManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;

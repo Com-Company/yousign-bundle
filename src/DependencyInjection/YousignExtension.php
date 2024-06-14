@@ -34,7 +34,6 @@ class YousignExtension extends Extension
         }
 
         $container->addDefinitions($definitions);
-//        $container->setParameter('eventMapping', $eventMapping);
 
         $loader->load('services.yaml');
     }

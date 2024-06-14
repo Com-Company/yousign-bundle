@@ -3,6 +3,12 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         public: false
+        bind:
+            $webhookParsers: !tagged_iterator 'yousign.webhook_parser'
+
+    _instanceof:
+        ComCompany\YousignBundle\Service\WebhookParserInterface:
+            tags: [ name: 'yousign.webhook_parser' ]
 
     ComCompany\YousignBundle\:
         resource: '../../'

@@ -18,9 +18,7 @@ final class Webhook
     {
         $this->manager = $manager;
     }
-    /**
-     * @Route("/api/subscription/yousign/webhook", methods={"POST"}, name="subscription.yousign.webhook")
-     */
+
     public function __invoke(Request $request): Response
     {
         try {
