@@ -11,7 +11,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('yousign');
 
-        $treeBuilder->getRootNode()
+        $treeBuilder->getRootNode() // @phpstan-ignore-line
             ->children()
                 ->arrayNode('eventHandlers')
                     ->arrayPrototype()

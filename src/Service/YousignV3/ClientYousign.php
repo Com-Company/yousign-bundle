@@ -41,18 +41,20 @@ class ClientYousign implements SignatureContractInterface
         $signature = new SignatureResponse();
         $procedureId = $this->initiateProcedure($config);
         $signature->setProcedureId($procedureId);
-
         $signers = [];
+        $documents = [];
+
         foreach ($fields->all() as $field) {
             $document = $field->getDocument();
-            $supplierId = null;
-            if (!in_array($document, $signature->getDocuments(), true)) {
+
+            if (!isset($documents[$document->getId()])) {
                 $supplierId = $this->sendDocument($procedureId, $document);
                 $documenResponse = new DocumentResponse(
                     $document->getId(),
                     $supplierId,
                     'signable_document'
                 );
+                $documents[$document->getId()] = $supplierId;
                 $signature->addDocument($documenResponse);
             }
 
@@ -71,7 +73,7 @@ class ClientYousign implements SignatureContractInterface
                         [],
                         $memberConfig);
             }
-            $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $supplierId]));
+            $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $documents[$document->getId()]]));
         }
 
         $members = [];

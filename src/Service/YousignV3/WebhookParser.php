@@ -19,7 +19,7 @@ class WebhookParser implements WebhookParserInterface
 
     public function parse(Request $request): ?WebhookPayload
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode((string) $request->getContent(), true);
         if (!($data['data']['signature_request'] ?? false)) {
             return null; // todo exception
         }

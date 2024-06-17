@@ -19,7 +19,7 @@ class WebhookParser implements WebhookParserInterface
 
     public function parse(Request $request): ?WebhookPayload
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode((string) $request->getContent(), true);
         if (!($data['data']['procedure'] ?? false)) {
             return null; // todo exception
         }
@@ -34,7 +34,7 @@ class WebhookParser implements WebhookParserInterface
             $data['procedure']['status'] ?? '',
             $data['procedure']['members'] ?? [],
             $data['procedure']['files'] ?? [],
-            $workspace,
+            is_string($workspace) ? $workspace : null,
         );
 
         return $payload;

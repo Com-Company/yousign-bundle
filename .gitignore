@@ -4,3 +4,4 @@ auth.json
 .cache
 .composer
 .env
+.php-cs-fixer.cache

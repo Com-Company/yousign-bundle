@@ -29,7 +29,7 @@ class YousignExtension extends Extension
             $definition->setAutoconfigured(true);
             $definition->setPublic(false);
             $definition->setClass($service);
-            $definitions[$service] = $definition;
+            $definitions[(string) $service] = $definition;
         }
 
         $container->addDefinitions($definitions);

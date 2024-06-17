@@ -2,7 +2,8 @@
 
 namespace ComCompany\YousignBundle\Controller;
 
-use ComCompany\YousignBundle\Service\YousignV3\WebhookManager;
+use ComCompany\SignatureContract\Exception\ClientException;
+use ComCompany\YousignBundle\Service\WebhookManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +21,7 @@ final class Webhook
         try {
             $this->manager->handle($request);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), $e->getCode(), $e, $e->getErrors());
+            throw new ClientException($e->getMessage(), $e->getCode(), $e);
         }
 
         return new Response();
