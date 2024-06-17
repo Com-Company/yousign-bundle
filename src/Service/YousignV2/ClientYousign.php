@@ -123,7 +123,7 @@ class ClientYousign implements SignatureContractInterface
         }
     }
 
-    public function archiveDocument(string $fileName, string $content): string
+    public function archiveDocument(string $fileName, string $content): void
     {
         $response = $this->request('POST', 'archives', ['json' => [
             'fileName' => $fileName,
@@ -132,8 +132,6 @@ class ClientYousign implements SignatureContractInterface
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Archive Document error', 500);
         }
-
-        return $response['id'];
     }
 
     /**
