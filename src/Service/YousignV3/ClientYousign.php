@@ -259,7 +259,7 @@ class ClientYousign implements SignatureContractInterface
 
     public function archiveDocument(string $fileName, string $content): void
     {
-        //Not yet implemented in V3
+        // Not yet implemented in V3
     }
 
     /**

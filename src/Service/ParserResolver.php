@@ -2,7 +2,6 @@
 
 namespace ComCompany\YousignBundle\Service;
 
-use ComCompany\YousignBundle\Service\WebhookParserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class ParserResolver
@@ -10,7 +9,6 @@ class ParserResolver
     /** @var iterable<WebhookParserInterface> */
     private iterable $parsers;
 
-    /** @param iterable<WebhookParserInterface> $purifiers */
     public function __construct(iterable $webhookParsers)
     {
         $this->parsers = $webhookParsers;
@@ -23,6 +21,7 @@ class ParserResolver
                 return $parser->parse($request);
             }
         }
+
         return null;
     }
 }

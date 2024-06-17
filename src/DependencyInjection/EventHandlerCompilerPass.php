@@ -3,8 +3,8 @@
 namespace ComCompany\YousignBundle\DependencyInjection;
 
 use ComCompany\YousignBundle\Service\WebhookManager;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class EventHandlerCompilerPass implements CompilerPassInterface
@@ -23,7 +23,7 @@ class EventHandlerCompilerPass implements CompilerPassInterface
             if ($event) {
                 $definition->addMethodCall(
                     'addEventHandler',
-                    array($event, new Reference($id))
+                    [$event, new Reference($id)]
                 );
             }
         }

@@ -28,7 +28,8 @@ class WebhookManager
         $this->eventHandlers[$payload->getEventName()]->handle($payload);
     }
 
-    public function addEventHandler(string $event, $eventHandler) {
+    public function addEventHandler(string $event, $eventHandler)
+    {
         $this->eventHandlers[$event] = $eventHandler;
     }
 }

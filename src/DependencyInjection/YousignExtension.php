@@ -2,7 +2,6 @@
 
 namespace ComCompany\YousignBundle\DependencyInjection;
 
-use App\Service\Supplier\Api\Advenis\Subscription\Initial\Bulletin;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -16,14 +15,14 @@ class YousignExtension extends Extension
         $config = $this->processConfiguration(new Configuration(), $configs);
         $eventMapping = array_reduce(
             $config['eventHandlers'],
-            fn($res, $elt) => array_merge($res, [$elt['event'] => $elt['service']]),
+            fn ($res, $elt) => array_merge($res, [$elt['event'] => $elt['service']]),
             []
         );
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $definitions = [];
-        foreach($eventMapping as $event => $service) {
+        foreach ($eventMapping as $event => $service) {
             $definition = $container->register('yousign.event_handler.'.$event);
             $definition->addTag('event_handler', ['event' => $event]);
             $definition->setAutowired(true);
