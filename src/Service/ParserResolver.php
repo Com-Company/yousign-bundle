@@ -2,7 +2,6 @@
 
 namespace ComCompany\YousignBundle\Service;
 
-use ComCompany\YousignBundle\DTO\WebhookPayload;
 use Symfony\Component\HttpFoundation\Request;
 
 class ParserResolver
@@ -16,11 +15,11 @@ class ParserResolver
         $this->parsers = $webhookParsers;
     }
 
-    public function resolve(Request $request): ?WebhookPayload
+    public function resolve(Request $request): ?WebhookParserInterface
     {
         foreach ($this->parsers as $parser) {
             if ($parser->support($request)) {
-                return $parser->parse($request);
+                return $parser;
             }
         }
 

@@ -17,6 +17,7 @@ class EventHandlerCompilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition(WebhookManager::class);
         $taggedServices = $container->findTaggedServiceIds('event_handler');
+        $defaultHandler = $container->findTaggedServiceIds('default_handler');
 
         foreach ($taggedServices as $id => $tags) {
             $event = $tags[0]['event'] ?? false;
@@ -26,6 +27,14 @@ class EventHandlerCompilerPass implements CompilerPassInterface
                     [$event, new Reference($id)]
                 );
             }
+        }
+
+        $key = array_key_first($defaultHandler);
+        if ($key) {
+            $definition->addMethodCall(
+                'setDefaultHandler',
+                [new Reference($key)]
+            );
         }
     }
 }
