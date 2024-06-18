@@ -27,11 +27,11 @@ class WebhookParser implements WebhookParserInterface
 
         $signatureRequest = $data['data']['signature_request'];
         if (!($signatureRequest['id'] ?? false)) {
-            throw new YousignException('Signature id not found', 0, null, $data);
+            throw new YousignException('signature_request[\'id\'] not found', 0, null, $data);
         }
 
         $payload = new WebhookPayload(
-            $data['event_id'],
+            $signatureRequest['id'],
             $data['event_name'] ?? '',
             $signatureRequest['status'] ?? '',
             $signatureRequest['signers'] ?? [],
