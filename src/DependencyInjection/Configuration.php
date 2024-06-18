@@ -14,15 +14,19 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode() // @phpstan-ignore-line
             ->children()
                 ->arrayNode('eventHandlers')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('event')->isRequired()->end()
-                            ->scalarNode('service')->isRequired()->end()
+                    ->children()
+                        ->scalarNode('default')->end()
+                    ->arrayNode('bindings')
+                        ->arrayPrototype()
+                            ->children()
+                                ->scalarNode('event')->end()
+                                ->scalarNode('service')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
             ->end()
-        ;
+        ->end();
 
         return $treeBuilder;
     }
