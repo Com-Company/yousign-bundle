@@ -1,7 +1,7 @@
 # Yousign V3 Signature Interface
 Component Symfony pour signature Yousign V3
 
-Auteur : Andrei DACIN (adacin@com-company.fr)
+Auteur : Andrei DACIN (adacin@com-company.fr); Valentin DO ESPIRITO SANTO (vdoespiritosanto@com-company.fr)
 ## installation avec composer
 Les projets doivent avoir une dépendance de 
 ```bash
@@ -23,34 +23,58 @@ Exécutez ensuite
 $ composer require com-company/symfony-signature-interface
 ```
 ## Configuration au sein de votre projet
-### 1 . Déclaration du client Yousign ;
+### 1 . Déclaration des varaible d'environnement
 
 
-        app.yousign_client:
-        class: 'Symfony\Component\HttpClient\HttpClient'
-        factory: [ 'Symfony\Component\HttpClient\HttpClient', 'create' ]
-        arguments:
-            $defaultOptions:
-                headers:
-                    content-type: 'application/json'
-                    Authorization: 'Bearer %yousign_token_v3%'
-                base_uri: '%yousign_uri_v3%'
+    ###> yousign ###
+    #dev URI = 'https://staging-api.yousign.com' 
+    #prod URI = 'https://api.yousign.com'
+    YOUSIGN_V2_URI=''
+    YOUSIGN_V2_APP_URI=''
+    YOUSIGN_V2_TOKEN=''
+    YOUSIGN_V2_ACCESS_KEY='' #que si vous gérez les webhook yousign
+    ###< yousign ###
+    ###> yousign V3 ###
+    #dev URI = 'https://api-sandbox.yousign.app/v3/'
+    #prod URI = 'https://api.yousign.app/v3/'
+    YOUSIGN_V3_URI=''
+    YOUSIGN_V3_TOKEN=''
+    YOUSIGN_V3_ACCESS_KEY='' #que si vous gérez les webhook yousign
+    ###< yousign V3###
 
-### 2. Déclarer le service de connexion à Yousign dans votre app : 
 
-        ComCompany\YousignBundle\Service\ClientYousign:
-        arguments:
-            $httpClient: '@app.yousign_client'
-### 3. Utiliser le service dans votre app
+### 2. Si votre application va gerer lew webhooks 
 
-        ComCompany\SignatureContract\Service\SignatureContractInterface:
-        alias: 'ComCompany\YousignBundle\Service\ClientYousign'
-
-### 4. Déclarer les paramètres de connexion à Yousign dans votre fichier .env
-```bash
-YOUSIGN_V3_URI='https://api-sandbox.yousign.app/v3/' dev ou 'https://api.yousign.app/v3/' prod
- 
-YOUSIGN_V3_TOKEN='token_yousign_v3'
-
-YOUSIGN_V3_WORKSPACE_ID='workspace_id_de_votre_application'
+#### 1. Créer un fichier yousign.yaml dans le dossier config/routes avec le contenu suivant:
+```yaml
+yousign:
+    resource: '@YousignBundle/Resources/config/routes.yaml'
+    prefix: /api/subscription/yousign
 ```
+
+- Vous pouvez éditer les prefix à votre convenance
+- La routes des webhooks sera : {prefix} /webhook/{version} où version est la version de l'api yousign (v2 ou v3)
+
+#### 2. Déclarer les events listeners:
+Pour chaque event que vous souhaitez écouter, créez une class implémentant EventHandlerInterface
+```php
+<?php
+    interface EventHandlerInterface
+    {
+    public function handle(WebhookPayload $payload): void;
+    
+        public function onError(YousignException $e): void;
+    }
+```
+Créer un fichier yousign.yaml dans le dossier config/packages avec le contenu suivant:
+ 
+```yaml
+    yousign:
+    eventHandlers:
+    default: 'App\Service\Signature\WebhookProcess' 
+    bindings: 
+        - {event: 'yousign.webhook.signature.completed', service: 'App\Service\Signature\WebhookProcess'}
+```
+Où event est le nom de l'event yousign à écouter et service est la méthode à appeler lors de la réception de l'event
+
+la class déclarée avec default (default: 'App\Service\Signature\WebhookProcess') intercepte tous les events qui ne sont pas bindés 
