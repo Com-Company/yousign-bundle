@@ -36,6 +36,17 @@ class ClientYousign implements SignatureContractInterface
         $this->httpClient = $httpClient;
     }
 
+    /**
+     * Allow to create entire signature process, with provided parameters.
+     *
+     * @param Fields               $fields       array of elements which define a field to sign (Member, Document and Location)
+     * @param ProcedureConfig|null $config       params to initiate new signature request
+     * @param MemberConfig|null    $memberConfig params to initiate members configs like signature signature_level and signature authentication
+     *
+     * @return SignatureResponse DTO with all information about the signature
+     *
+     * @throws ApiException|ClientException
+     */
     public function start(Fields $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
     {
         $signature = new SignatureResponse();
