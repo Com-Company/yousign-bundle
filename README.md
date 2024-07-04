@@ -20,7 +20,7 @@ Les projets doivent avoir une dépendance de
 
 Exécutez ensuite
 ```bash
-$ composer require com-company/symfony-signature-interface
+$ composer require com-company/yousign-bundle
 ```
 ## Configuration au sein de votre projet
 ### 1 . Déclaration des varaible d'environnement

@@ -26,12 +26,6 @@
         "thecodingmachine/phpstan-safe-rule": "^1.0",
         "thecodingmachine/phpstan-strict-rules": "^1.0"
     },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.4",
-        "phpstan/phpstan": "1.7.*",
-        "thecodingmachine/phpstan-safe-rule": "^1.0",
-        "thecodingmachine/phpstan-strict-rules": "^1.0"
-    },
     "repositories": [{
         "type": "git",
         "url": "https://github.com/Com-Company/symfony-contract-signature"
