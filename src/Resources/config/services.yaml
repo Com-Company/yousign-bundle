@@ -1,3 +1,13 @@
+parameters:
+    yousign_v2_uri: "%env(default::YOUSIGN_V2_URI)%"
+    yousign_v2_access_key: "%env(default::YOUSIGN_V2_ACCESS_KEY)%"
+    yousign_v2_token: "%env(default::YOUSIGN_V2_TOKEN)%"
+    yousign_v2_app_uri: "%env(default::YOUSIGN_V2_APP_URI)%"
+    yousign_v3_uri: "%env(default::YOUSIGN_V3_URI)%"
+    yousign_v3_token: "%env(default::YOUSIGN_V3_TOKEN)%"
+    yousign_v3_access_key: "%env(default::YOUSIGN_V3_ACCESS_KEY)%"
+    yousign_v3_workspace_id: "%env(default::YOUSIGN_V3_WORKSPACE_ID)%"
+
 services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
