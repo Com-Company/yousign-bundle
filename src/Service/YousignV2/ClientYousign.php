@@ -70,12 +70,9 @@ class ClientYousign implements SignatureContractInterface
         return new SignatureResponse();
     }
 
-    public function activate(string $idProcedure): void
+    public function activate(string $idProcedure): SignatureResponse
     {
-        $response = $this->request('PUT', sprintf('procedures/%s', $idProcedure), ['json' => ['start' => true]]);
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-            throw new ApiException('Activate signature error', 500);
-        }
+        throw new ClientException("'activate' method is no longer implemented for this Yousing v2.", 501);
     }
 
     public function downloadDocument(string $procedureId, string $documentId): string
