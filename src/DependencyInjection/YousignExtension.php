@@ -22,7 +22,7 @@ class YousignExtension extends Extension
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        if (!$config['eventHandlers']) {
+        if (!($config['eventHandlers'] ?? false)) {
             return;
         }
         $defaultHandler = $config['eventHandlers']['default'] ?? null;
