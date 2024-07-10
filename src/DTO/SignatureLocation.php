@@ -2,8 +2,6 @@
 
 namespace ComCompany\YousignBundle\DTO;
 
-use ComCompany\SignatureContract\DTO\Location;
-
 class SignatureLocation extends Location
 {
     public int $width;

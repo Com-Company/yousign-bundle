@@ -2,7 +2,7 @@
 
 namespace ComCompany\YousignBundle\Controller;
 
-use ComCompany\SignatureContract\Exception\ClientException;
+use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Service\WebhookManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

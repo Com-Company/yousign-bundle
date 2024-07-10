@@ -4,21 +4,30 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO;
 
-use ComCompany\SignatureContract\DTO\ProcedureConfig as SignatureContractProcedureConfig;
-
-class ProcedureConfig extends SignatureContractProcedureConfig
+class ProcedureConfig
 {
+    public string $name;
+
+    public string $externalId;
+
+    /** @var array<string, mixed> */
+    public array $extraConfig;
     public ?string $workspaceId;
 
+    /** @param array<string, mixed> $extraConfig */
     public function __construct(
         string $name,
         string $externalId,
+        array $extraConfig = [],
         ?string $workspaceId = null
     ) {
-        parent::__construct($name, $externalId);
+        $this->name = $name;
+        $this->externalId = $externalId;
+        $this->extraConfig = $extraConfig;
         $this->workspaceId = $workspaceId;
     }
 
+    /** @return array<string, mixed> */
     public function toArray(): array
     {
         return [

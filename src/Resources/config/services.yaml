@@ -15,6 +15,7 @@ services:
         public: false
         bind:
             $webhookParsers: !tagged_iterator 'yousign.webhook_parser'
+            $clientImplementations: !tagged_iterator { tag: 'yousign.client_implementation', index_by: 'key' }
 
     _instanceof:
         ComCompany\YousignBundle\Service\WebhookParserInterface:
@@ -50,9 +51,13 @@ services:
                 base_uri: '%yousign_v2_uri%'
 
     ComCompany\YousignBundle\Service\YousignV3\ClientYousign:
+        tags:
+            - { name: 'yousign.client_implementation', key: !php/const: ComCompany\YousignBundle\Constants\Versions::V3 }
         arguments:
             $httpClient: '@yousign_bundle.v3_client'
 
     ComCompany\YousignBundle\Service\YousignV2\ClientYousign:
+        tags:
+            - { name: 'yousign.client_implementation', key: !php/const: ComCompany\YousignBundle\Constants\Versions::V2 }
         arguments:
             $httpClient: '@yousign_bundle.v2_client'
