@@ -20,10 +20,7 @@ use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-use function Safe\json_decode;
-use function Safe\sprintf;
-
-class ClientYousign implements ClientInterface
+class ClientYousign implements SignatureContractInterface
 {
     public const DEFAULT_CONFIG = [
         'name' => 'Procédure de signature',
@@ -172,7 +169,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('procedureId is required');
         }
 
-        $response = $this->request('GET', sprintf('signature_requests/%s', $procedureId));
+        $response = $this->request('GET', 'signature_requests/'.$procedureId);
 
         if (!is_array($response) || empty($response)) {
             throw new ApiException('Get procedure error');
@@ -188,7 +185,7 @@ class ClientYousign implements ClientInterface
             $signatureResponse->addDocument(new DocumentResponse(null, $document['id'], $document['nature']));
         }
 
-        $signers = $this->request('GET', sprintf('signature_requests/%s/signers', $procedureId));
+        $signers = $this->request('GET', "signature_requests/{$procedureId}/signers");
         if (is_array($signers) && !empty($signers)) {
             foreach ($signers as $signer) {
                 $signatureResponse->addMember(new MemberResponse(null, $signer['id'], $signer['status'], $signer['signature_link']));
@@ -200,7 +197,7 @@ class ClientYousign implements ClientInterface
 
     public function activate(string $procedureId): SignatureResponse
     {
-        $response = $this->request('POST', sprintf('signature_requests/%s/activate', $procedureId), []);
+        $response = $this->request('POST', "signature_requests/{$procedureId}/activate");
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Activate signature error', 500);
         }
@@ -234,7 +231,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('documentId is required');
         }
 
-        $response = $this->httpClient->request('GET', sprintf('signature_requests/%s/documents/%s/download', $procedureId, $documentId), []);
+        $response = $this->httpClient->request('GET', "signature_requests/{$procedureId}/documents/{$documentId}/download");
 
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
@@ -253,7 +250,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('signerId is required');
         }
 
-        $response = $this->httpClient->request('GET', sprintf('signature_requests/%s/signers/%s/audit_trails/download', $procedureId, $signerId), []);
+        $response = $this->httpClient->request('GET', 'signature_requests/{$procedureId}/signers/{$signerId}/audit_trails/download');
 
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
@@ -264,7 +261,7 @@ class ClientYousign implements ClientInterface
 
     public function deleteProcedure(string $procedureId): void
     {
-        $response = $this->request('POST', sprintf('signature_requests/%s/cancel', $procedureId), []);
+        $response = $this->request('POST', "signature_requests/{$procedureId}/cancel");
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }

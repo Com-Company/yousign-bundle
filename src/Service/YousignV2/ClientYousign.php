@@ -15,12 +15,12 @@ use Safe\Exceptions\StringsException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-use function Safe\json_decode;
-use function Safe\sprintf;
 
 class ClientYousign implements ClientInterface
 {
     private HttpClientInterface $httpClient;
+
+    private string $appUri;
 
     public function __construct(HttpClientInterface $httpClient)
     {
@@ -53,7 +53,6 @@ class ClientYousign implements ClientInterface
 
     /**
      * @throws ClientException
-     * @throws ApiException|StringsException
      */
     public function getProcedure(string $procedureId): SignatureResponse
     {
@@ -61,13 +60,28 @@ class ClientYousign implements ClientInterface
             throw new ClientException('procedureId is required');
         }
 
-        $response = $this->request('GET', sprintf('procedures/%s', $procedureId));
+        $response = $this->request('GET', 'procedures/'.$procedureId);
 
         if (!is_array($response) || empty($response)) {
             throw new ApiException('Get procedure error');
         }
+        $removePrefix = fn ($str) => substr($str, strrpos("/$str", '/'));
+        $signatureResponse = new SignatureResponse();
+        $signatureResponse->setProcedureId($response['id']);
+        $signatureResponse->setCreationDate($response['createdAt']);
+        $signatureResponse->setExpirationDate($response['expiresAt']);
+        $signatureResponse->setWorkspaceId($removePrefix($response['workspace_id']));
 
-        return new SignatureResponse();
+        foreach (($response['files'] ?? []) as $document) {
+            $signatureResponse->addDocument(new DocumentResponse(null, $removePrefix($document['id']), $document['type']));
+        }
+
+        foreach (($response['members'] ?? []) as $member) {
+            $signUri = ($this->appUri ?? '')."/procedure/sign?members={$member['id']}";
+            $signatureResponse->addMember(new MemberResponse(null, $removePrefix($member['id']), $member['status'], $signUri));
+        }
+
+        return $signatureResponse;
     }
 
     public function activate(string $idProcedure): SignatureResponse
@@ -85,7 +99,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('documentId is required');
         }
 
-        $response = $this->httpClient->request('GET', sprintf('%s/download', $documentId), []);
+        $response = $this->httpClient->request('GET', $documentId.'/download');
 
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
@@ -104,7 +118,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('signerId is required');
         }
 
-        $response = $this->httpClient->request('GET', sprintf('%s/proof?format=pdf', $signerId), []);
+        $response = $this->httpClient->request('GET', "members/{$signerId}/proof?format=pdf");
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing getProof: '.$response->getContent(false), $response->getStatusCode());
         }
@@ -114,7 +128,7 @@ class ClientYousign implements ClientInterface
 
     public function deleteProcedure(string $procedureId): void
     {
-        $response = $this->request('DELETE', sprintf('procedures/%s', $procedureId), []);
+        $response = $this->request('DELETE', 'procedures/'.$procedureId);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
@@ -153,5 +167,10 @@ class ClientYousign implements ClientInterface
         } catch (TransportExceptionInterface $e) {
             throw new ApiException('Error Processing Request : '.$e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    public function setAppUri(string $appUri)
+    {
+        $this->appUri = $appUri;
     }
 }
