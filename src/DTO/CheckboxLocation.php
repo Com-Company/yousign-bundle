@@ -2,8 +2,6 @@
 
 namespace ComCompany\YousignBundle\DTO;
 
-use ComCompany\SignatureContract\DTO\Location;
-
 class CheckboxLocation extends Location
 {
     public int $size;

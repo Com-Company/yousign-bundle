@@ -2,15 +2,15 @@
 
 namespace ComCompany\YousignBundle\Service\YousignV2;
 
-use ComCompany\SignatureContract\DTO\Document;
-use ComCompany\SignatureContract\DTO\Fields;
-use ComCompany\SignatureContract\DTO\Member;
-use ComCompany\SignatureContract\DTO\MemberConfig;
-use ComCompany\SignatureContract\DTO\ProcedureConfig;
-use ComCompany\SignatureContract\Exception\ApiException;
-use ComCompany\SignatureContract\Exception\ClientException;
-use ComCompany\SignatureContract\Response\SignatureResponse;
-use ComCompany\SignatureContract\Service\SignatureContractInterface;
+use ComCompany\YousignBundle\DTO\Document;
+use ComCompany\YousignBundle\DTO\Fields;
+use ComCompany\YousignBundle\DTO\Member;
+use ComCompany\YousignBundle\DTO\MemberConfig;
+use ComCompany\YousignBundle\DTO\ProcedureConfig;
+use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
+use ComCompany\YousignBundle\Exception\ApiException;
+use ComCompany\YousignBundle\Exception\ClientException;
+use ComCompany\YousignBundle\Service\ClientInterface;
 use Safe\Exceptions\StringsException;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use function Safe\json_decode;
 use function Safe\sprintf;
 
-class ClientYousign implements SignatureContractInterface
+class ClientYousign implements ClientInterface
 {
     private HttpClientInterface $httpClient;
 

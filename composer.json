@@ -13,7 +13,6 @@
     "require": {
         "ext-json": "*",
         "php": ">=7.4|>=8.0",
-        "com-company/symfony-contract-signature": "*",
         "symfony/config": "*",
         "symfony/mime": "*",
         "symfony/dependency-injection": "*",
@@ -25,9 +24,5 @@
         "phpstan/phpstan": "1.7.*",
         "thecodingmachine/phpstan-safe-rule": "^1.0",
         "thecodingmachine/phpstan-strict-rules": "^1.0"
-    },
-    "repositories": [{
-        "type": "git",
-        "url": "https://github.com/Com-Company/symfony-contract-signature"
-    }]
+    }
 }
