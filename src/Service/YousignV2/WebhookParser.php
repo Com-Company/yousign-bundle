@@ -7,8 +7,6 @@ use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\WebhookParserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use function Safe\json_decode;
-
 class WebhookParser implements WebhookParserInterface
 {
     public function support(Request $request): bool

@@ -61,3 +61,5 @@ services:
             - { name: 'yousign.client_implementation', key: !php/const: ComCompany\YousignBundle\Constants\Versions::V2 }
         arguments:
             $httpClient: '@yousign_bundle.v2_client'
+        calls:
+            - setAppUri: ['%yousign_v2_app_uri%']
