@@ -6,12 +6,12 @@ namespace ComCompany\YousignBundle\DTO;
 
 class Document
 {
-    private string $id;
+    private ?string $id;
     private string $name;
     private string $path;
-    private string $mimeType;
+    private ?string $mimeType;
 
-    public function __construct(string $id, string $name, string $path, string $mimeType)
+    public function __construct(string $name, string $path, ?string $mimeType= null, ?string $id = null)
     {
         $this->id = $id;
         $this->name = $name;

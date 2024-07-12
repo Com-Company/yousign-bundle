@@ -27,14 +27,14 @@ class Member
      * @param array<string, mixed>             $additional
      */
     public function __construct(
-        ?string $id,
         string $firstName,
         string $lastName,
         string $email,
         string $phone,
         array $fields = [],
         array $additional = [],
-        ?MemberConfig $config = null
+        ?MemberConfig $config = null,
+        ?string $id = null
     ) {
         $this->id = $id;
         $this->firstName = $firstName;
