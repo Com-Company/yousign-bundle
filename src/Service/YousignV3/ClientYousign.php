@@ -150,8 +150,7 @@ class ClientYousign implements ClientInterface
             }
 
         }catch (YousignException $e) {
-            $error = [];
-            $error['errors'] = $e->getErrors() ?? [];
+            $error = $e->getErrors();
             $error['member'] = [
                 'first_name' => $member->getFirstName(),
                 'last_name' => $member->getFirstName(),
@@ -348,12 +347,12 @@ class ClientYousign implements ClientInterface
         $response = $this->httpClient->request($method, $url, $options);
         if (300 <= $response->getStatusCode()) {
             $errors = $this->handleError($response->getContent(false));
-            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors['errors'] ?? []);
+            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors ?? []);
         }
 
         if (($data = json_decode($response->getContent(false), true)) === null) {
             $errors = $this->handleError($response->getContent(false));
-            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors['errors'] ?? []);
+            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors ?? []);
         }
 
         return $data;
