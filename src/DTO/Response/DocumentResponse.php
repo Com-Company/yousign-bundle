@@ -8,13 +8,13 @@ class DocumentResponse
 {
     private ?string $id;
     private string $supplierId;
-    private string $type;
+    private string $nature;
 
-    public function __construct(?string $id, string $supplierId, string $type)
+    public function __construct(?string $id, string $supplierId, string $nature)
     {
         $this->id = $id;
         $this->supplierId = $supplierId;
-        $this->type = $type;
+        $this->nature = $nature;
     }
 
     public function getId(): ?string
@@ -27,8 +27,8 @@ class DocumentResponse
         return $this->supplierId;
     }
 
-    public function getType(): ?string
+    public function getNature(): string
     {
-        return $this->type;
+        return $this->nature;
     }
 }

@@ -15,4 +15,12 @@ class CheckboxLocation extends Location
         $this->optional = $optional;
         $this->checked = $checked;
     }
+
+    public function toArray(): array
+    {
+        return array_merge(
+            parent::toArray(),
+            get_object_vars($this),
+        );
+    }
 }

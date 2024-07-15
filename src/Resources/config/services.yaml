@@ -52,13 +52,13 @@ services:
 
     ComCompany\YousignBundle\Service\YousignV3\ClientYousign:
         tags:
-            - { name: 'yousign.client_implementation', key: !php/const: ComCompany\YousignBundle\Constants\Versions::V3 }
+            - { name: 'yousign.client_implementation', key: 'v3' }
         arguments:
             $httpClient: '@yousign_bundle.v3_client'
 
     ComCompany\YousignBundle\Service\YousignV2\ClientYousign:
         tags:
-            - { name: 'yousign.client_implementation', key: !php/const: ComCompany\YousignBundle\Constants\Versions::V2 }
+            - { name: 'yousign.client_implementation', key: 'v3' }
         arguments:
             $httpClient: '@yousign_bundle.v2_client'
         calls:

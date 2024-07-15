@@ -4,6 +4,7 @@ namespace ComCompany\YousignBundle\Service;
 
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Fields;
+use ComCompany\YousignBundle\DTO\Location;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -32,8 +33,22 @@ interface ClientInterface
 
     /**
      * Create a new Signer.
+     *
+     * @return mixed[]
      */
-    public function sendSigner(string $procedureId, Member $member): string;
+    public function sendSigner(string $procedureId, Member $member): array;
+
+    /**
+     * Create a follower.
+     *
+     * @return mixed[]
+     */
+    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): array;
+
+    /**
+     * Add fields.
+     */
+    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string;
 
     /**
      * Add Document to a Signature Request.
@@ -58,7 +73,7 @@ interface ClientInterface
     /**
      * Delete a Signature Request.
      */
-    public function deleteProcedure(string $procedureId): void;
+    public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void;
 
     /**
      * Get a Document.

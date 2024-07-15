@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\Exception;
 
-class ClientException extends \Exception
+class ClientException extends YousignException
 {
     /**
      * @param string $message message
      * @param int    $code    error code
      */
-    public function __construct(string $message, int $code = 500, ?\Throwable $previous = null)
+    public function __construct(string $message, int $code = 500, ?\Throwable $previous = null, array $errors = [])
     {
-        parent::__construct('Client Error: '.$message, $code, $previous);
+        parent::__construct('Client Error: '.$message, $code, $previous, $errors);
     }
 }

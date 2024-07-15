@@ -13,4 +13,12 @@ class SignatureLocation extends Location
         $this->width = $width;
         $this->height = $height;
     }
+
+    public function toArray(): array
+    {
+        return array_merge(
+            parent::toArray(),
+            get_object_vars($this),
+        );
+    }
 }

@@ -4,6 +4,7 @@ namespace ComCompany\YousignBundle\Service\YousignV3;
 
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Fields;
+use ComCompany\YousignBundle\DTO\Location;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
@@ -17,14 +18,15 @@ use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Service\ClientInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ClientYousign implements SignatureContractInterface
+class ClientYousign implements ClientInterface
 {
     public const DEFAULT_CONFIG = [
         'name' => 'Procédure de signature',
     ];
+
+    public const CANCEL_REASONS = ['contractualization_aborted', 'errors_in_document', 'other'];
 
     private HttpClientInterface $httpClient;
 
@@ -60,7 +62,7 @@ class ClientYousign implements SignatureContractInterface
                 $documenResponse = new DocumentResponse(
                     $document->getId(),
                     $supplierId,
-                    'signable_document'
+                    $document->getNature()
                 );
                 $documents[$document->getId()] = $supplierId;
                 $signature->addDocument($documenResponse);
@@ -72,14 +74,15 @@ class ClientYousign implements SignatureContractInterface
             if (!isset($signers[$hash])) {
                 $signers[$hash] =
                     new MemberDTO(
-                        $memberInfos['id'],
                         $memberInfos['firstName'],
                         $memberInfos['lastName'],
                         $memberInfos['email'],
                         $memberInfos['phone'],
                         [],
                         [],
-                        $memberConfig);
+                        $memberConfig,
+                        $memberInfos['id']
+                    );
             }
             $signers[$hash]->addField(array_merge($field->getLocation()->toArray(), ['document_id' => $documents[$document->getId()]]));
         }
@@ -87,7 +90,7 @@ class ClientYousign implements SignatureContractInterface
         $members = [];
         foreach ($signers as $signer) {
             $idSigner = $this->sendSigner($procedureId, $signer);
-            $members[$idSigner] = $signer;
+            $members[$idSigner['id']] = $signer;
         }
 
         $signatureActivated = $this->activate($procedureId);
@@ -126,7 +129,10 @@ class ClientYousign implements SignatureContractInterface
         return $response['id'];
     }
 
-    public function sendSigner(string $procedureId, Member $member): string
+    /**
+     * @return mixed[]
+     */
+    public function sendSigner(string $procedureId, Member $member): array
     {
         if (!$member instanceof MemberDTO) {
             throw new ClientException('Error when adding signer');
@@ -141,6 +147,43 @@ class ClientYousign implements SignatureContractInterface
             throw new ApiException('Create signer error');
         }
 
+        return $response;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): array
+    {
+        $uri = 'signature_requests/'.$procedureId.'/followers';
+        $response = $this->request('POST', $uri, [
+            'body' => json_encode([
+                'email' => $email,
+                'locale' => $locale,
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        return is_array($response) ? $response : [$response];
+    }
+
+    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string
+    {
+        if (!$location instanceof Location) {
+            throw new ClientException('Error when adding field');
+        }
+
+        $uri = 'signature_requests/'.$procedureId.'/documents/'.$documentId.'/fields';
+        $response = $this->request('POST', $uri, [
+            'body' => json_encode([
+                'signer_id' => $signerId,
+                ...$location->toArray(),
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+            throw new ApiException('Create field error');
+        }
+
         return $response['id'];
     }
 
@@ -149,7 +192,7 @@ class ClientYousign implements SignatureContractInterface
         $file = new \SplFileInfo($document->getPath());
         $formData = new FormDataPart([
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
-            'nature' => 'signable_document',
+            'nature' => $document->getNature(),
         ]);
         $header = $formData->getPreparedHeaders();
         $responseYousign = $this->request('POST', 'signature_requests/'.$procedureId.'/documents', [
@@ -259,9 +302,18 @@ class ClientYousign implements SignatureContractInterface
         return $response->getContent(false);
     }
 
-    public function deleteProcedure(string $procedureId): void
+    public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void
     {
-        $response = $this->request('POST', "signature_requests/{$procedureId}/cancel");
+        if (!in_array($reason, self::CANCEL_REASONS, true)) {
+            throw new ClientException('Cancel reason must be one of: '.implode(', ', self::CANCEL_REASONS), 400);
+        }
+
+        $response = $this->request(
+            'POST',
+            "signature_requests/{$procedureId}/cancel",
+            [
+                'body' => json_encode(['reason' => $reason, 'custom_note' => $customNote], JSON_THROW_ON_ERROR),
+            ]);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
@@ -279,20 +331,36 @@ class ClientYousign implements SignatureContractInterface
      */
     private function request(string $method, string $url, array $options = [])
     {
-        try {
-            $response = $this->httpClient->request($method, $url, $options);
-
-            if (300 <= $response->getStatusCode()) {
-                throw new ApiException($response->getContent(false), $response->getStatusCode());
-            }
-
-            if (($data = json_decode($response->getContent(false), true)) === null) {
-                throw new ClientException('Error get result', $response->getStatusCode());
-            }
-
-            return $data;
-        } catch (TransportExceptionInterface $e) {
-            throw new ApiException($e->getMessage(), $e->getCode(), $e);
+        $response = $this->httpClient->request($method, $url, $options);
+        if (300 <= $response->getStatusCode()) {
+            $errors = $this->handleError($response->getContent(false));
+            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors['errors'] ?? []);
         }
+
+        if (($data = json_decode($response->getContent(false), true)) === null) {
+            $errors = $this->handleError($response->getContent(false));
+            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors['errors'] ?? []);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function handleError(string $response): array
+    {
+        $errorsDatas = json_decode($response, true);
+
+        $errors = [];
+        $errors['message'] = $errorsDatas['detail'] ?? '';
+
+        if (is_array($errorsDatas['invalid_params'] ?? false)) {
+            $errors['errors'] = array_map(static function ($item) {
+                return ($item['name'] && $item['reason']) ? [$item['name'] => $item['reason']] : $item;
+            }, $errorsDatas['invalid_params']);
+        }
+
+        return $errors;
     }
 }

@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO;
 
+use ComCompany\YousignBundle\Constants\SignatureAuthenticationMode;
+use ComCompany\YousignBundle\Constants\SignatureLevels;
+use ComCompany\YousignBundle\Exception\ClientException;
+
 class MemberConfig
 {
-    /**
-     * contralia: 'signatureLevel', required [SIMPLE_LCP, ADVANCED_LCP, ADVANCED_NCP, ADVANCED_QCP, QUALIFIED ].
-     *
-     * yousign: 'signature_level', required [electronic_signature, advanced_electronic_signature, qualified_electronic_signature]
-     */
     public string $signatureLevel;
 
-    /**
-     * contralia: 'signatureType', optional; default = OTP [OTP, PAD, TOKEN, CONSENT_PROOF, CONSENT beta ou IDENTITY].
-     *
-     * yousign: 'signature_authentication_mode', optional; default = null [otp_email, otp_sms, no_otp]
-     */
-    public ?string $signatureAuthentificationMode = null;
+    public string $signatureAuthenticationMode;
 
-    public function __construct(string $signatureLevel, ?string $signatureAuthentificationMode = null)
+    public function __construct(string $signatureLevel, ?string $signatureAuthenticationMode = null)
     {
+        if (!in_array($signatureLevel, SignatureLevels::SIGNATURE_LEVELS, true)) {
+            throw new ClientException('Invalid signature level', 400);
+        }
+
+        if (!in_array($signatureAuthenticationMode, SignatureAuthenticationMode::AUTHENTIFICATION_MODE, true)) {
+            throw new ClientException('Invalid Authentication mode', 400);
+        }
         $this->signatureLevel = $signatureLevel;
-        $this->signatureAuthentificationMode = $signatureAuthentificationMode;
+        $this->signatureAuthenticationMode = $signatureAuthenticationMode;
     }
 
     /** @return array<string, mixed> */

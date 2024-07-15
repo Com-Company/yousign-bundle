@@ -11,11 +11,7 @@ class Location
     public int $page;
     public string $type;
 
-    /**
-     * @param int $x
-     * @param int $y
-     */
-    public function __construct($x, $y, int $page, string $type)
+    public function __construct(int $x, int $y, int $page, string $type)
     {
         $this->x = $x;
         $this->y = $y;

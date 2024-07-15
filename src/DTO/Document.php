@@ -6,20 +6,22 @@ namespace ComCompany\YousignBundle\DTO;
 
 class Document
 {
-    private ?string $id;
     private string $name;
     private string $path;
+    private string $nature;
+    private ?string $id;
     private ?string $mimeType;
 
-    public function __construct(string $name, string $path, ?string $mimeType= null, ?string $id = null)
+    public function __construct(string $name, string $path, string $nature = 'signable_document', ?string $mimeType = null, ?string $id = null)
     {
         $this->id = $id;
         $this->name = $name;
+        $this->nature = $nature;
         $this->path = $path;
         $this->mimeType = $mimeType;
     }
 
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -34,7 +36,12 @@ class Document
         return $this->path;
     }
 
-    public function getMimeType(): string
+    public function getNature(): string
+    {
+        return $this->nature;
+    }
+
+    public function getMimeType(): ?string
     {
         return $this->mimeType;
     }

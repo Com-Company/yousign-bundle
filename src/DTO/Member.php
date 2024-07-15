@@ -15,7 +15,7 @@ class Member
     private string $phone;
 
     /** @var array<string, mixed> */
-    private array $additional;
+    private array $extraConfig;
 
     private ?MemberConfig $config;
 
@@ -24,7 +24,7 @@ class Member
 
     /**
      * @param array<int, array<string, mixed>> $fields
-     * @param array<string, mixed>             $additional
+     * @param array<string, mixed>             $extraConfig
      */
     public function __construct(
         string $firstName,
@@ -32,7 +32,7 @@ class Member
         string $email,
         string $phone,
         array $fields = [],
-        array $additional = [],
+        array $extraConfig = [],
         ?MemberConfig $config = null,
         ?string $id = null
     ) {
@@ -42,7 +42,7 @@ class Member
         $this->email = $email;
         $this->phone = $phone;
         $this->fields = $fields;
-        $this->additional = $additional;
+        $this->extraConfig = $extraConfig;
         $this->config = $config;
     }
 
@@ -62,7 +62,7 @@ class Member
             'fields' => $this->fields,
             'signature_level' => $this->getConfig()->signatureLevel ?? null,
             'signature_authentication_mode' => $this->getConfig()->signatureAuthentificationMode ?? null,
-        ] + $this->getAdditional();
+        ] + $this->getExtraConfig();
     }
 
     /**
@@ -101,9 +101,9 @@ class Member
     }
 
     /** @return array<string, mixed> */
-    public function getAdditional(): array
+    public function getExtraConfig(): array
     {
-        return $this->additional;
+        return $this->extraConfig;
     }
 
     public function getConfig(): ?MemberConfig

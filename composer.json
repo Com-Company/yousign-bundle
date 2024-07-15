@@ -17,7 +17,8 @@
         "symfony/mime": "*",
         "symfony/dependency-injection": "*",
         "symfony/http-foundation": "^5.4|^6.0|^7.0",
-        "symfony/http-kernel": "^5.4|^6.0|^7.0"
+        "symfony/http-kernel": "^5.4|^6.0|^7.0",
+        "symfony/http-client-contracts": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.4",
