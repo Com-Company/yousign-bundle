@@ -15,6 +15,7 @@ use ComCompany\YousignBundle\DTO\Response\MemberResponse;
 use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
+use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -138,13 +139,26 @@ class ClientYousign implements ClientInterface
             throw new ClientException('Error when adding signer');
         }
 
-        $uri = 'signature_requests/'.$procedureId.'/signers';
-        $response = $this->request('POST', $uri, [
-            'body' => json_encode($member->formattedForApi(), JSON_THROW_ON_ERROR),
-        ]);
+        try{
+            $uri = 'signature_requests/'.$procedureId.'/signers';
+            $response = $this->request('POST', $uri, [
+                'body' => json_encode($member->formattedForApi(), JSON_THROW_ON_ERROR),
+            ]);
 
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-            throw new ApiException('Create signer error');
+            if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+                throw new ApiException('Create signer error');
+            }
+
+        }catch (YousignException $e) {
+            $error = [];
+            $error['errors'] = $e->getErrors() ?? [];
+            $error['member'] = [
+                'first_name' => $member->getFirstName(),
+                'last_name' => $member->getFirstName(),
+                'email' => $member->getEmail(),
+                'phone' => $member->getPhone(),
+            ];
+            throw new ClientException('Error when adding signer', 400, $e, $error);
         }
 
         return $response;
@@ -357,7 +371,10 @@ class ClientYousign implements ClientInterface
 
         if (is_array($errorsDatas['invalid_params'] ?? false)) {
             $errors['errors'] = array_map(static function ($item) {
-                return ($item['name'] && $item['reason']) ? [$item['name'] => $item['reason']] : $item;
+                return ($item['name'] && $item['reason']) ? [
+                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1]: $item['name'],
+                    'reason' => $item['reason']
+                ] : $item;
             }, $errorsDatas['invalid_params']);
         }
 
