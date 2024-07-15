@@ -187,10 +187,10 @@ class ClientYousign implements ClientInterface
 
         $uri = 'signature_requests/'.$procedureId.'/documents/'.$documentId.'/fields';
         $response = $this->request('POST', $uri, [
-            'body' => json_encode([
-                'signer_id' => $signerId,
-                ...$location->toArray(),
-            ], JSON_THROW_ON_ERROR),
+            'body' => json_encode(array_merge(
+                ['signer_id' => $signerId],
+                $location->toArray(),
+            ), JSON_THROW_ON_ERROR),
         ]);
 
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
