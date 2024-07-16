@@ -61,7 +61,7 @@ class Member
             ],
             'fields' => $this->fields,
             'signature_level' => $this->getConfig()->signatureLevel ?? null,
-            'signature_authentication_mode' => $this->getConfig()->signatureAuthentificationMode ?? null,
+            'signature_authentication_mode' => $this->getConfig()->signatureAuthenticationMode ?? null,
         ] + $this->getExtraConfig();
     }
 
