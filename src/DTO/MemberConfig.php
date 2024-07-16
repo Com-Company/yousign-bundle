@@ -20,7 +20,7 @@ class MemberConfig
             throw new ClientException('Invalid signature level', 400);
         }
 
-        if (!in_array($signatureAuthenticationMode, SignatureAuthenticationMode::AUTHENTIFICATION_MODE, true)) {
+        if (!in_array($signatureAuthenticationMode, SignatureAuthenticationMode::AUTHENTICATION_MODE, true)) {
             throw new ClientException('Invalid Authentication mode', 400);
         }
         $this->signatureLevel = $signatureLevel;

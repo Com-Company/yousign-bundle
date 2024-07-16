@@ -2,19 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ComCompany\YousignBundle\DTO;
+namespace ComCompany\YousignBundle\DTO\Field;
 
-class Location
+class Field
 {
-    public int $x;
-    public int $y;
     public int $page;
     public string $type;
 
-    public function __construct(int $x, int $y, int $page, string $type)
+    public function __construct(int $page, string $type)
     {
-        $this->x = $x;
-        $this->y = $y;
         $this->page = $page;
         $this->type = $type;
     }

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO;
 
+use ComCompany\YousignBundle\DTO\Field\Field;
+
 class FieldLocation
 {
     private Member $member;
     private Document $document;
-    private Location $location;
+    private Field $location;
 
-    public function __construct(Member $member, Document $document, Location $location)
+    public function __construct(Member $member, Document $document, Field $location)
     {
         $this->member = $member;
         $this->document = $document;
@@ -37,12 +39,12 @@ class FieldLocation
         $this->document = $document;
     }
 
-    public function getLocation(): Location
+    public function getLocation(): Field
     {
         return $this->location;
     }
 
-    public function setLocation(Location $location): void
+    public function setLocation(Field $location): void
     {
         $this->location = $location;
     }

@@ -4,8 +4,8 @@ namespace ComCompany\YousignBundle\Service;
 
 use ComCompany\YousignBundle\Constants\Versions;
 use ComCompany\YousignBundle\DTO\Document;
-use ComCompany\YousignBundle\DTO\Fields;
-use ComCompany\YousignBundle\DTO\Location;
+use ComCompany\YousignBundle\DTO\Field\Field;
+use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -27,7 +27,7 @@ class YousignClient implements ClientInterface
         return $this->implementations[$version];
     }
 
-    public function start(Fields $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null, string $version = Versions::V3): SignatureResponse
+    public function start(FieldsLocations $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null, string $version = Versions::V3): SignatureResponse
     {
         return $this->getInstance($version)->start($fields, $config, $memberConfig);
     }
@@ -53,7 +53,7 @@ class YousignClient implements ClientInterface
         return $this->getInstance($version)->sendFollower($email, $locale);
     }
 
-    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location, string $version = Versions::V3): string
+    public function sendField(string $procedureId, string $signerId, string $documentId, Field $location, string $version = Versions::V3): string
     {
         return $this->getInstance($version)->sendField($procedureId, $signerId, $documentId, $location);
     }

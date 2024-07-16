@@ -3,8 +3,8 @@
 namespace ComCompany\YousignBundle\Service;
 
 use ComCompany\YousignBundle\DTO\Document;
-use ComCompany\YousignBundle\DTO\Fields;
-use ComCompany\YousignBundle\DTO\Location;
+use ComCompany\YousignBundle\DTO\Field\Field;
+use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -24,7 +24,7 @@ interface ClientInterface
      *
      * @throws ApiException|ClientException
      */
-    public function start(Fields $signatureLocationList, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse;
+    public function start(FieldsLocations $signatureLocationList, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse;
 
     /**
      * Initiate a new signature request.
@@ -48,7 +48,7 @@ interface ClientInterface
     /**
      * Add fields.
      */
-    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string;
+    public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string;
 
     /**
      * Add Document to a Signature Request.

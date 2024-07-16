@@ -1,15 +1,19 @@
 <?php
 
-namespace ComCompany\YousignBundle\DTO;
+namespace ComCompany\YousignBundle\DTO\Field;
 
-class SignatureLocation extends Location
+class SignatureField extends Field
 {
+    public int $x;
+    public int $y;
     public int $width;
     public int $height;
 
     public function __construct(int $x, int $y, int $page, string $type, int $width, int $height)
     {
-        parent::__construct($x, $y, $page, $type);
+        parent::__construct($page, $type);
+        $this->x = $x;
+        $this->y = $y;
         $this->width = $width;
         $this->height = $height;
     }

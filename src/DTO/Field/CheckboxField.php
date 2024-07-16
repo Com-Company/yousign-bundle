@@ -1,16 +1,20 @@
 <?php
 
-namespace ComCompany\YousignBundle\DTO;
+namespace ComCompany\YousignBundle\DTO\Field;
 
-class CheckboxLocation extends Location
+class CheckboxField extends Field
 {
+    public int $x;
+    public int $y;
     public int $size;
     public bool $optional;
     public bool $checked;
 
     public function __construct(int $x, int $y, int $page, string $type, int $size = 16, bool $optional = false, bool $checked = false)
     {
-        parent::__construct($x, $y, $page, $type);
+        parent::__construct($page, $type);
+        $this->x = $x;
+        $this->y = $y;
         $this->size = $size;
         $this->optional = $optional;
         $this->checked = $checked;

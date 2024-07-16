@@ -2,7 +2,7 @@
 
 namespace ComCompany\YousignBundle\DTO;
 
-class Fields
+class FieldsLocations
 {
     /** @var FieldLocation[] */
     private array $fieldsLocations = [];

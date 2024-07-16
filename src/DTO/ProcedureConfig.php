@@ -18,7 +18,7 @@ class ProcedureConfig
     /** @param array<string, mixed> $extraConfig */
     public function __construct(
         string $name,
-        array $extraConfig = [],
+        ?array $extraConfig = [],
         ?string $externalId = null,
         ?string $workspaceId = null
     ) {

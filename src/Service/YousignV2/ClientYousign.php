@@ -3,8 +3,8 @@
 namespace ComCompany\YousignBundle\Service\YousignV2;
 
 use ComCompany\YousignBundle\DTO\Document;
-use ComCompany\YousignBundle\DTO\Fields;
-use ComCompany\YousignBundle\DTO\Location;
+use ComCompany\YousignBundle\DTO\Field\Field;
+use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -28,7 +28,7 @@ class ClientYousign implements ClientInterface
     }
 
     /** @throws ClientException */
-    public function start(Fields $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
+    public function start(FieldsLocations $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
     {
         throw new ClientException("'start' method is no longer implemented for this Yousing v2.", 501);
     }
@@ -183,7 +183,7 @@ class ClientYousign implements ClientInterface
         $this->appUri = $appUri;
     }
 
-    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string
+    public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
     {
         throw new ClientException("'sendField' method is no longer implemented for this Yousing v2.", 501);
     }

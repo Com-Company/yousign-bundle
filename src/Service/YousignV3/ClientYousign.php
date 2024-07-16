@@ -3,10 +3,9 @@
 namespace ComCompany\YousignBundle\Service\YousignV3;
 
 use ComCompany\YousignBundle\DTO\Document;
-use ComCompany\YousignBundle\DTO\Fields;
-use ComCompany\YousignBundle\DTO\Location;
+use ComCompany\YousignBundle\DTO\Field\Field;
+use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Member;
-use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
@@ -39,7 +38,7 @@ class ClientYousign implements ClientInterface
     /**
      * Allow to create entire signature process, with provided parameters.
      *
-     * @param Fields               $fields       array of elements which define a field to sign (Member, Document and Location)
+     * @param FieldsLocations               $fields       array of elements which define a field to sign (Member, Document and Location)
      * @param ProcedureConfig|null $config       params to initiate new signature request
      * @param MemberConfig|null    $memberConfig params to initiate members configs like signature signature_level and signature authentication
      *
@@ -47,7 +46,7 @@ class ClientYousign implements ClientInterface
      *
      * @throws ApiException|ClientException
      */
-    public function start(Fields $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
+    public function start(FieldsLocations $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
     {
         $signature = new SignatureResponse();
         $procedureId = $this->initiateProcedure($config);
@@ -74,7 +73,7 @@ class ClientYousign implements ClientInterface
             $hash = md5(print_r($member->toArray(), true));
             if (!isset($signers[$hash])) {
                 $signers[$hash] =
-                    new MemberDTO(
+                    new Member(
                         $memberInfos['firstName'],
                         $memberInfos['lastName'],
                         $memberInfos['email'],
@@ -135,11 +134,7 @@ class ClientYousign implements ClientInterface
      */
     public function sendSigner(string $procedureId, Member $member): array
     {
-        if (!$member instanceof MemberDTO) {
-            throw new ClientException('Error when adding signer');
-        }
-
-        try{
+        try {
             $uri = 'signature_requests/'.$procedureId.'/signers';
             $response = $this->request('POST', $uri, [
                 'body' => json_encode($member->formattedForApi(), JSON_THROW_ON_ERROR),
@@ -148,8 +143,7 @@ class ClientYousign implements ClientInterface
             if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
                 throw new ApiException('Create signer error');
             }
-
-        }catch (YousignException $e) {
+        } catch (YousignException $e) {
             $error = $e->getErrors();
             $error['member'] = [
                 'first_name' => $member->getFirstName(),
@@ -179,18 +173,14 @@ class ClientYousign implements ClientInterface
         return is_array($response) ? $response : [$response];
     }
 
-    public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string
+    public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
     {
-        if (!$location instanceof Location) {
-            throw new ClientException('Error when adding field');
-        }
-
         $uri = 'signature_requests/'.$procedureId.'/documents/'.$documentId.'/fields';
         $response = $this->request('POST', $uri, [
-            'body' => json_encode([
-                'signer_id' => $signerId,
-                ...$location->toArray(),
-            ], JSON_THROW_ON_ERROR),
+            'body' => json_encode(array_merge(
+                ['signer_id' => $signerId],
+                $location->toArray(),
+            ), JSON_THROW_ON_ERROR),
         ]);
 
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
@@ -347,12 +337,12 @@ class ClientYousign implements ClientInterface
         $response = $this->httpClient->request($method, $url, $options);
         if (300 <= $response->getStatusCode()) {
             $errors = $this->handleError($response->getContent(false));
-            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors ?? []);
+            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors);
         }
 
         if (($data = json_decode($response->getContent(false), true)) === null) {
             $errors = $this->handleError($response->getContent(false));
-            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors ?? []);
+            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors);
         }
 
         return $data;
@@ -371,8 +361,8 @@ class ClientYousign implements ClientInterface
         if (is_array($errorsDatas['invalid_params'] ?? false)) {
             $errors['errors'] = array_map(static function ($item) {
                 return ($item['name'] && $item['reason']) ? [
-                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1]: $item['name'],
-                    'reason' => $item['reason']
+                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1] : $item['name'],
+                    'reason' => $item['reason'],
                 ] : $item;
             }, $errorsDatas['invalid_params']);
         }
