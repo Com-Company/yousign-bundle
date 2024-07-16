@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO\Response\Signature;
 
-class MemberResponse
+class Member
 {
     private ?string $id;
     private string $supplierId;

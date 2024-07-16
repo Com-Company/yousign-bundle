@@ -5,15 +5,16 @@ namespace ComCompany\YousignBundle\Service\YousignV3;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
-use ComCompany\YousignBundle\DTO\Member;
+use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
-use ComCompany\YousignBundle\DTO\Response\Signature\DocumentResponse as SignatureDocumentResponse;
-use ComCompany\YousignBundle\DTO\Response\Signature\MemberResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\Document as SignatureDocumentResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\Member;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
@@ -77,7 +78,7 @@ class ClientYousign implements ClientInterface
             $hash = md5(print_r($member->toArray(), true));
             if (!isset($signers[$hash])) {
                 $signers[$hash] =
-                    new Member(
+                    new MemberDTO(
                         $memberInfos['firstName'],
                         $memberInfos['lastName'],
                         $memberInfos['email'],
@@ -101,7 +102,7 @@ class ClientYousign implements ClientInterface
         foreach ($members as $idSigner => $originalSigner) {
             foreach ($signatureActivated->getMembers() as $signer) {
                 if ($idSigner === $signer->getSupplierId()) {
-                    $memberResponse = new MemberResponse(
+                    $memberResponse = new Member(
                         $originalSigner->getId(),
                         $idSigner,
                         'pending',
@@ -133,7 +134,7 @@ class ClientYousign implements ClientInterface
         return new ProcedureResponse($response['id'], $response['status'], $response['expiration_date']);
     }
 
-    public function sendSigner(string $procedureId, Member $member): SignerResponse
+    public function sendSigner(string $procedureId, MemberDTO $member): SignerResponse
     {
         try {
             $uri = 'signature_requests/'.$procedureId.'/signers';
@@ -235,7 +236,7 @@ class ClientYousign implements ClientInterface
         $signers = $this->request('GET', "signature_requests/{$procedureId}/signers");
         if (is_array($signers) && !empty($signers)) {
             foreach ($signers as $signer) {
-                $signatureResponse->addMember(new MemberResponse(null, $signer['id'], $signer['status'], $signer['signature_link']));
+                $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
             }
         }
 
@@ -261,7 +262,7 @@ class ClientYousign implements ClientInterface
 
         if (is_array($response['signers']) && !empty($response['signers'])) {
             foreach ($response['signers'] as $signer) {
-                $signatureResponse->addMember(new MemberResponse(null, $signer['id'], $signer['status'], $signer['signature_link']));
+                $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
             }
         }
 
@@ -369,5 +370,37 @@ class ClientYousign implements ClientInterface
         }
 
         return $errors;
+    }
+
+    public function getAuditTrail(string $procedureId, string $signerId): AuditResponse
+    {
+        $response = $this->request(
+            'GET',
+            "signature_requests/{$procedureId}/signers/{$signerId}/audit_trails",
+        );
+
+        if (
+            !is_array($response)
+            || !is_array($signer = $response['signer'] ?? false)
+            || !is_array($signatureRequest = $response['signature_request'] ?? false)
+        ) {
+            throw new ApiException('getAuditTrail error', 500);
+        }
+
+        $audit = new AuditResponse();
+        $audit->getSigner()->setId($signer['id']);
+        $audit->getSigner()->setFirstname($signer['first_name']);
+        $audit->getSigner()->setLastname($signer['last_name']);
+        $audit->getSigner()->setPhone($signer['phone_number']);
+        $audit->getSigner()->setEmail($signer['email_address']);
+        $audit->getSigner()->setConsentGivenAt($signer['consent_given_at']);
+        $audit->getSigner()->setSignatureProcessCompleteAt($signer['signature_process_completed_at']);
+
+        $audit->getSignatureRequest()->setId($signatureRequest['id']);
+        $audit->getSignatureRequest()->setName($signatureRequest['name']);
+        $audit->getSignatureRequest()->setSentAt($signatureRequest['sent_at']);
+        $audit->getSignatureRequest()->setExpiredAt($signatureRequest['expired_at']);
+
+        return $audit;
     }
 }

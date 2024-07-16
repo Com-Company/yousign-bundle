@@ -5,14 +5,15 @@ namespace ComCompany\YousignBundle\Service\YousignV2;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
-use ComCompany\YousignBundle\DTO\Member;
+use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
-use ComCompany\YousignBundle\DTO\Response\Signature\DocumentResponse as SignatureDocumentResponse;
-use ComCompany\YousignBundle\DTO\Response\Signature\MemberResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\Document as SignatureDocumentResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\Member;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
@@ -44,7 +45,7 @@ class ClientYousign implements ClientInterface
     }
 
     /**  @throws ClientException */
-    public function sendSigner(string $procedureId, Member $member): SignerResponse
+    public function sendSigner(string $procedureId, MemberDTO $member): SignerResponse
     {
         throw new ClientException("'sendSigner' method is no longer implemented for this Yousing v2.", 501);
     }
@@ -88,7 +89,7 @@ class ClientYousign implements ClientInterface
 
         foreach (($response['members'] ?? []) as $member) {
             $signUri = ($this->appUri ?? '')."/procedure/sign?members={$member['id']}";
-            $signatureResponse->addMember(new MemberResponse(null, $removePrefix($member['id']), $member['status'], $signUri));
+            $signatureResponse->addMember(new Member(null, $removePrefix($member['id']), $member['status'], $signUri));
         }
 
         return $signatureResponse;
@@ -182,5 +183,10 @@ class ClientYousign implements ClientInterface
     public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
     {
         throw new ClientException("'sendField' method is no longer implemented for this Yousing v2.", 501);
+    }
+
+    public function getAuditTrail(string $procedureId, string $signerId): AuditResponse
+    {
+        throw new ClientException("'auditTrail' method is not supported in Yousing v2.", 501);
     }
 }

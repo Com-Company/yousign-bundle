@@ -9,6 +9,7 @@ use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
@@ -84,5 +85,10 @@ class YousignClient implements ClientInterface
     public function activate(string $procedureId, string $version = Versions::V3): SignatureResponse
     {
         return $this->getInstance($version)->activate($procedureId);
+    }
+
+    public function getAuditTrail(string $procedureId, string $signerId, string $version = Versions::V3): AuditResponse
+    {
+        return $this->getInstance($version)->getAuditTrail($procedureId, $signerId);
     }
 }

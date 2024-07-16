@@ -22,10 +22,10 @@ class SignatureResponse
     private ?string $expirationDate;
     private ?string $workspaceId;
 
-    /** @var DocumentResponse[] */
+    /** @var Document[] */
     private array $documents = [];
 
-    /** @var MemberResponse[] */
+    /** @var Member[] */
     private array $members = [];
 
     public function getStatus(): string
@@ -78,23 +78,23 @@ class SignatureResponse
         $this->workspaceId = $workspaceId;
     }
 
-    public function addDocument(DocumentResponse $document): void
+    public function addDocument(Document $document): void
     {
         $this->documents[] = $document;
     }
 
-    /** @return DocumentResponse[] */
+    /** @return Document[] */
     public function getDocuments(): array
     {
         return $this->documents;
     }
 
-    public function addMember(MemberResponse $member): void
+    public function addMember(Member $member): void
     {
         $this->members[] = $member;
     }
 
-    /** @return MemberResponse[] */
+    /** @return Member[] */
     public function getMembers(): array
     {
         return $this->members;
