@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ComCompany\YousignBundle\DTO\Response;
+namespace ComCompany\YousignBundle\DTO\Response\Signature;
 
 class MemberResponse
 {

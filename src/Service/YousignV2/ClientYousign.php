@@ -9,8 +9,12 @@ use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
-use ComCompany\YousignBundle\DTO\Response\MemberResponse;
-use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
+use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
+use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\DocumentResponse as SignatureDocumentResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\MemberResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
+use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Service\ClientInterface;
@@ -34,33 +38,25 @@ class ClientYousign implements ClientInterface
     }
 
     /** @throws ClientException */
-    public function initiateProcedure(?ProcedureConfig $config = null): string
+    public function initiateProcedure(?ProcedureConfig $config = null): ProcedureResponse
     {
         throw new ClientException("'initiateProcedure' method is no longer implemented for this Yousing v2.", 501);
     }
 
-    /**
-     * @return mixed[]
-     *
-     * @throws ClientException
-     */
-    public function sendSigner(string $procedureId, Member $member): array
+    /**  @throws ClientException */
+    public function sendSigner(string $procedureId, Member $member): SignerResponse
     {
         throw new ClientException("'sendSigner' method is no longer implemented for this Yousing v2.", 501);
     }
 
-    /**
-     * @return array<string, string>
-     *
-     * @throws ClientException
-     */
-    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): array
+    /** @throws ClientException */
+    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): FollowerResponse
     {
         throw new ClientException("'sendFollower' method is no longer implemented for this Yousing v2.", 501);
     }
 
     /** @throws ClientException */
-    public function sendDocument(string $procedureId, Document $document): string
+    public function sendDocument(string $procedureId, Document $document): DocumentResponse
     {
         throw new ClientException("'sendDocument' method is no longer implemented for this Yousing v2.", 501);
     }
@@ -87,7 +83,7 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setWorkspaceId($removePrefix($response['workspace_id']));
 
         foreach (($response['files'] ?? []) as $document) {
-            $signatureResponse->addDocument(new DocumentResponse(null, $removePrefix($document['id']), $document['type']));
+            $signatureResponse->addDocument(new SignatureDocumentResponse(null, $removePrefix($document['id']), $document['type']));
         }
 
         foreach (($response['members'] ?? []) as $member) {
