@@ -10,6 +10,7 @@ use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\MemberResponse;
 use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
@@ -139,7 +140,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('Error when adding signer');
         }
 
-        try{
+        try {
             $uri = 'signature_requests/'.$procedureId.'/signers';
             $response = $this->request('POST', $uri, [
                 'body' => json_encode($member->formattedForApi(), JSON_THROW_ON_ERROR),
@@ -148,8 +149,7 @@ class ClientYousign implements ClientInterface
             if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
                 throw new ApiException('Create signer error');
             }
-
-        }catch (YousignException $e) {
+        } catch (YousignException $e) {
             $error = $e->getErrors();
             $error['member'] = [
                 'first_name' => $member->getFirstName(),
@@ -371,12 +371,44 @@ class ClientYousign implements ClientInterface
         if (is_array($errorsDatas['invalid_params'] ?? false)) {
             $errors['errors'] = array_map(static function ($item) {
                 return ($item['name'] && $item['reason']) ? [
-                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1]: $item['name'],
-                    'reason' => $item['reason']
+                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1] : $item['name'],
+                    'reason' => $item['reason'],
                 ] : $item;
             }, $errorsDatas['invalid_params']);
         }
 
         return $errors;
+    }
+
+    public function getAuditTrail(string $procedureId, string $signerId): AuditResponse
+    {
+        $response = $this->request(
+            'GET',
+            "signature_requests/{$procedureId}/signers/{$signerId}/audit_trails",
+        );
+
+        if (
+            !is_array($response)
+            || !is_array($signer = $response['signer'] ?? false)
+            || !is_array($signatureRequest = $response['signature_request'] ?? false)
+        ) {
+            throw new ApiException('getAuditTrail error', 500);
+        }
+
+        $audit = new AuditResponse();
+        $audit->getSigner()->setId($signer['id']);
+        $audit->getSigner()->setFirstname($signer['first_name']);
+        $audit->getSigner()->setLastname($signer['last_name']);
+        $audit->getSigner()->setPhone($signer['phone_number']);
+        $audit->getSigner()->setEmail($signer['email_address']);
+        $audit->getSigner()->setConsentGivenAt($signer['consent_given_at']);
+        $audit->getSigner()->setSignatureProcessCompleteAt($signer['signature_process_completed_at']);
+
+        $audit->getSignatureRequest()->setId($signatureRequest['id']);
+        $audit->getSignatureRequest()->setName($signatureRequest['name']);
+        $audit->getSignatureRequest()->setSentAt($signatureRequest['sent_at']);
+        $audit->getSignatureRequest()->setExpiredAt($signatureRequest['expired_at']);
+
+        return $audit;
     }
 }

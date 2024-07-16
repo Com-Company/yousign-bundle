@@ -8,6 +8,7 @@ use ComCompany\YousignBundle\DTO\Location;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
@@ -79,4 +80,11 @@ interface ClientInterface
      * Get a Document.
      */
     public function downloadDocument(string $procedureId, string $documentId): string;
+
+    /**
+     * Get an Audit Trail (useful to get Signature date in yousign V3).
+     *
+     * @return mixed[]
+     */
+    public function getAuditTrail(string $procedureId, string $signerId): AuditResponse;
 }

@@ -8,6 +8,7 @@ use ComCompany\YousignBundle\DTO\Location;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
+use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\MemberResponse;
 use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
@@ -186,5 +187,10 @@ class ClientYousign implements ClientInterface
     public function sendField(string $procedureId, string $signerId, string $documentId, Location $location): string
     {
         throw new ClientException("'sendField' method is no longer implemented for this Yousing v2.", 501);
+    }
+
+    public function getAuditTrail(string $procedureId, string $signerId): AuditResponse
+    {
+        throw new ClientException("'auditTrail' method is not supported in Yousing v2.", 501);
     }
 }
