@@ -10,8 +10,12 @@ use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
-use ComCompany\YousignBundle\DTO\Response\MemberResponse;
-use ComCompany\YousignBundle\DTO\Response\SignatureResponse;
+use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
+use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\DocumentResponse as SignatureDocumentResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\MemberResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
+use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Exception\YousignException;
@@ -38,7 +42,7 @@ class ClientYousign implements ClientInterface
     /**
      * Allow to create entire signature process, with provided parameters.
      *
-     * @param FieldsLocations               $fields       array of elements which define a field to sign (Member, Document and Location)
+     * @param FieldsLocations      $fields       array of elements which define a field to sign (Member, Document and Location)
      * @param ProcedureConfig|null $config       params to initiate new signature request
      * @param MemberConfig|null    $memberConfig params to initiate members configs like signature signature_level and signature authentication
      *
@@ -49,8 +53,8 @@ class ClientYousign implements ClientInterface
     public function start(FieldsLocations $fields, ?ProcedureConfig $config = null, ?MemberConfig $memberConfig = null): SignatureResponse
     {
         $signature = new SignatureResponse();
-        $procedureId = $this->initiateProcedure($config);
-        $signature->setProcedureId($procedureId);
+        $procedure = $this->initiateProcedure($config);
+        $signature->setProcedureId($procedure->getId());
         $signers = [];
         $documents = [];
 
@@ -58,14 +62,14 @@ class ClientYousign implements ClientInterface
             $document = $field->getDocument();
 
             if (!isset($documents[$document->getId()])) {
-                $supplierId = $this->sendDocument($procedureId, $document);
-                $documenResponse = new DocumentResponse(
+                $supplierDocData = $this->sendDocument($procedure->getId(), $document);
+                $documentResponse = new SignatureDocumentResponse(
                     $document->getId(),
-                    $supplierId,
+                    $supplierDocData->getId(),
                     $document->getNature()
                 );
-                $documents[$document->getId()] = $supplierId;
-                $signature->addDocument($documenResponse);
+                $documents[$document->getId()] = $supplierDocData->getId();
+                $signature->addDocument($documentResponse);
             }
 
             $member = $field->getMember();
@@ -89,11 +93,11 @@ class ClientYousign implements ClientInterface
 
         $members = [];
         foreach ($signers as $signer) {
-            $idSigner = $this->sendSigner($procedureId, $signer);
-            $members[$idSigner['id']] = $signer;
+            $supplierSignerData = $this->sendSigner($procedure->getId(), $signer);
+            $members[$supplierSignerData->getId()] = $signer;
         }
 
-        $signatureActivated = $this->activate($procedureId);
+        $signatureActivated = $this->activate($procedure->getId());
         foreach ($members as $idSigner => $originalSigner) {
             foreach ($signatureActivated->getMembers() as $signer) {
                 if ($idSigner === $signer->getSupplierId()) {
@@ -112,7 +116,7 @@ class ClientYousign implements ClientInterface
         return $signature;
     }
 
-    public function initiateProcedure(?ProcedureConfig $config = null): string
+    public function initiateProcedure(?ProcedureConfig $config = null): ProcedureResponse
     {
         $configData = $config instanceof ProcedureConfigYousign
             ? $config->toArray()
@@ -126,13 +130,10 @@ class ClientYousign implements ClientInterface
             throw new ApiException('create signature_requests error', 500);
         }
 
-        return $response['id'];
+        return new ProcedureResponse($response['id'], $response['status'], $response['expiration_date']);
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function sendSigner(string $procedureId, Member $member): array
+    public function sendSigner(string $procedureId, Member $member): SignerResponse
     {
         try {
             $uri = 'signature_requests/'.$procedureId.'/signers';
@@ -143,6 +144,8 @@ class ClientYousign implements ClientInterface
             if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
                 throw new ApiException('Create signer error');
             }
+
+            return new SignerResponse($response['id'], $response['status']);
         } catch (YousignException $e) {
             $error = $e->getErrors();
             $error['member'] = [
@@ -153,14 +156,9 @@ class ClientYousign implements ClientInterface
             ];
             throw new ClientException('Error when adding signer', 400, $e, $error);
         }
-
-        return $response;
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): array
+    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): FollowerResponse
     {
         $uri = 'signature_requests/'.$procedureId.'/followers';
         $response = $this->request('POST', $uri, [
@@ -169,8 +167,11 @@ class ClientYousign implements ClientInterface
                 'locale' => $locale,
             ], JSON_THROW_ON_ERROR),
         ]);
+        if (!is_array($response)) {
+            throw new ApiException('Create follower error');
+        }
 
-        return is_array($response) ? $response : [$response];
+        return new FollowerResponse($response['email'], $response['locale'], $response['follower_link']);
     }
 
     public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
@@ -190,7 +191,7 @@ class ClientYousign implements ClientInterface
         return $response['id'];
     }
 
-    public function sendDocument(string $procedureId, Document $document): string
+    public function sendDocument(string $procedureId, Document $document): DocumentResponse
     {
         $file = new \SplFileInfo($document->getPath());
         $formData = new FormDataPart([
@@ -206,7 +207,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('Upload error', 500);
         }
 
-        return $responseYousign['id'];
+        return new DocumentResponse($responseYousign['id'], $responseYousign['total_pages'], $responseYousign['created_at']);
     }
 
     public function getProcedure(string $procedureId): SignatureResponse
@@ -228,7 +229,7 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setWorkspaceId($response['workspace_id']);
 
         foreach ($response['documents'] as $document) {
-            $signatureResponse->addDocument(new DocumentResponse(null, $document['id'], $document['nature']));
+            $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
         }
 
         $signers = $this->request('GET', "signature_requests/{$procedureId}/signers");
@@ -255,7 +256,7 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setWorkspaceId($response['workspace_id']);
 
         foreach ($response['documents'] as $document) {
-            $signatureResponse->addDocument(new DocumentResponse(null, $document['id'], $document['nature']));
+            $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
         }
 
         if (is_array($response['signers']) && !empty($response['signers'])) {

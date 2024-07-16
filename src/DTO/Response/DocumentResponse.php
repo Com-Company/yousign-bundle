@@ -6,29 +6,30 @@ namespace ComCompany\YousignBundle\DTO\Response;
 
 class DocumentResponse
 {
-    private ?string $id;
-    private string $supplierId;
-    private string $nature;
+    private string $id;
+    private int $totalPages;
 
-    public function __construct(?string $id, string $supplierId, string $nature)
+    private string $createdAt;
+
+    public function __construct(string $id, int $totalPages, string $createdAt)
     {
         $this->id = $id;
-        $this->supplierId = $supplierId;
-        $this->nature = $nature;
+        $this->totalPages = $totalPages;
+        $this->createdAt = $createdAt;
     }
 
-    public function getId(): ?string
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getSupplierId(): ?string
+    public function getTotalPages(): int
     {
-        return $this->supplierId;
+        return $this->totalPages;
     }
 
-    public function getNature(): string
+    public function getCreatedAt(): string
     {
-        return $this->nature;
+        return $this->createdAt;
     }
 }
