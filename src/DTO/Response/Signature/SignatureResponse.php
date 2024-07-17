@@ -7,13 +7,14 @@ namespace ComCompany\YousignBundle\DTO\Response\Signature;
 class SignatureResponse
 {
     private const STATUS_DRAFT = 'draft';
-    private const STATUS_PENDING = 'pending';
-    private const STATUS_ACTIVE = 'active';
-    private const STATUS_DONE = 'finished';
+    private const STATUS_APPROVAL = 'approval';
+    private const STATUS_REJECTED = 'rejected';
+    private const STATUS_ONGOING = 'ongoing';
+    private const STATUS_DECLINED = 'declined';
     private const STATUS_EXPIRED = 'expired';
-    private const STATUS_REFUSED = 'refused';
-    private const STATUS_CANCELED = 'canceled';
     private const STATUS_DELETED = 'deleted';
+    private const STATUS_CANCELED = 'canceled';
+    private const STATUS_DONE = 'done';
 
     private string $procedureId;
     private string $status;
@@ -27,6 +28,8 @@ class SignatureResponse
 
     /** @var Member[] */
     private array $members = [];
+
+    private ?DeclineInformation $declineInformation = null;
 
     public function getStatus(): string
     {
@@ -110,29 +113,42 @@ class SignatureResponse
         return $this->procedureId;
     }
 
+    public function getDeclineInformation(): ?DeclineInformation
+    {
+        return $this->declineInformation;
+    }
+
+    public function setDeclineInformation(?DeclineInformation $declineInformation): void
+    {
+        $this->declineInformation = $declineInformation;
+    }
+
     public function processStatus(string $status): string
     {
         switch ($status) {
             case 'draft':
                 return self::STATUS_DRAFT;
+            case 'approval':
+                return self::STATUS_APPROVAL;
+            case 'rejected':
+                return self::STATUS_REJECTED;
             case 'pending':
-                return self::STATUS_PENDING;
             case 'active':
-                return self::STATUS_ACTIVE;
+            case 'ongoing':
+                return self::STATUS_ONGOING;
+            case 'refused':
+            case 'declined':
+                return self::STATUS_DECLINED;
+            case 'expired':
+                return self::STATUS_EXPIRED;
+            case 'deleted':
+                return self::STATUS_DELETED;
+            case 'canceled':
+                return self::STATUS_CANCELED;
             case 'finished':
             case 'completed':
             case 'done':
                 return self::STATUS_DONE;
-            case 'expired':
-                return self::STATUS_EXPIRED;
-            case 'refused':
-            case 'declined':
-            case 'rejected':
-                return self::STATUS_REFUSED;
-            case 'canceled':
-                return self::STATUS_CANCELED;
-            case 'deleted':
-                return self::STATUS_DELETED;
             default:
                 return $status;
         }

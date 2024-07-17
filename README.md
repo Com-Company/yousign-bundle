@@ -78,3 +78,7 @@ Créer un fichier yousign.yaml dans le dossier config/packages avec le contenu s
 Où event est le nom de l'event yousign à écouter et service est la méthode à appeler lors de la réception de l'event
 
 la class déclarée avec default (default: 'App\Service\Signature\WebhookProcess') intercepte tous les events qui ne sont pas bindés 
+
+### 3.STATUS DE SIGNATURE/MEMBRES:
+
+Afin de préprarer la transition vers V3, le bundle ne renvoie que des statuts de Yousign V3, même pour les signatures initiées en V2. Chaque statut de V2 est mappé à un statut V3 correspondant.

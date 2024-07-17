@@ -13,6 +13,7 @@ use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
+use ComCompany\YousignBundle\DTO\Response\Signature\DeclineInformation;
 use ComCompany\YousignBundle\DTO\Response\Signature\Document as SignatureDocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\Signature\Member;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
@@ -228,6 +229,7 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setCreationDate($response['created_at']);
         $signatureResponse->setExpirationDate($response['expiration_date']);
         $signatureResponse->setWorkspaceId($response['workspace_id']);
+        $signatureResponse->setStatus($response['status']);
 
         foreach ($response['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
@@ -238,6 +240,10 @@ class ClientYousign implements ClientInterface
             foreach ($signers as $signer) {
                 $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
             }
+        }
+
+        if ($decline = $response['decline_information'] ?? false) {
+            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $decline['declined_at']));
         }
 
         return $signatureResponse;
@@ -264,6 +270,10 @@ class ClientYousign implements ClientInterface
             foreach ($response['signers'] as $signer) {
                 $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
             }
+        }
+
+        if ($decline = $response['decline_information'] ?? false) {
+            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $decline['declined_at']));
         }
 
         return $signatureResponse;
