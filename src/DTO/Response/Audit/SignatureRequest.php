@@ -8,8 +8,8 @@ final class SignatureRequest
 {
     private string $id;
     private string $name;
-    private string $sentAt;
-    private string $expiredAt;
+    private \DateTime $sentAt;
+    private \DateTime $expiredAt;
 
     public function getId(): string
     {
@@ -31,22 +31,22 @@ final class SignatureRequest
         $this->name = $name;
     }
 
-    public function getSentAt(): string
+    public function getSentAt(): \DateTime
     {
         return $this->sentAt;
     }
 
-    public function setSentAt(string $sentAt): void
+    public function setSentAt(\DateTime $sentAt): void
     {
         $this->sentAt = $sentAt;
     }
 
-    public function getExpiredAt(): string
+    public function getExpiredAt(): \DateTime
     {
         return $this->expiredAt;
     }
 
-    public function setExpiredAt(string $expiredAt): void
+    public function setExpiredAt(\DateTime $expiredAt): void
     {
         $this->expiredAt = $expiredAt;
     }

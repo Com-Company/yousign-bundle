@@ -10,9 +10,9 @@ class ProcedureResponse
 
     private string $status;
 
-    private string $expirationDate;
+    private \DateTime $expirationDate;
 
-    public function __construct(string $id, string $status, string $expirationDate)
+    public function __construct(string $id, string $status, \DateTime $expirationDate)
     {
         $this->id = $id;
         $this->status = $status;
@@ -29,7 +29,7 @@ class ProcedureResponse
         return $this->status;
     }
 
-    public function getExpirationDate(): ?string
+    public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
     }

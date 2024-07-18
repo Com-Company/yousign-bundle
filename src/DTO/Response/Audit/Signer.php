@@ -16,9 +16,9 @@ final class Signer
 
     private string $email;
 
-    private string $consentGivenAt;
+    private \DateTime $consentGivenAt;
 
-    private string $signatureProcessCompleteAt;
+    private \DateTime $signatureProcessCompleteAt;
 
     public function getId(): string
     {
@@ -70,22 +70,22 @@ final class Signer
         $this->email = $email;
     }
 
-    public function getConsentGivenAt(): string
+    public function getConsentGivenAt(): \DateTime
     {
         return $this->consentGivenAt;
     }
 
-    public function setConsentGivenAt(string $consentGivenAt): void
+    public function setConsentGivenAt(\DateTime $consentGivenAt): void
     {
         $this->consentGivenAt = $consentGivenAt;
     }
 
-    public function getSignatureProcessCompleteAt(): string
+    public function getSignatureProcessCompleteAt(): \DateTime
     {
         return $this->signatureProcessCompleteAt;
     }
 
-    public function setSignatureProcessCompleteAt(string $signatureProcessCompleteAt): void
+    public function setSignatureProcessCompleteAt(\DateTime $signatureProcessCompleteAt): void
     {
         $this->signatureProcessCompleteAt = $signatureProcessCompleteAt;
     }

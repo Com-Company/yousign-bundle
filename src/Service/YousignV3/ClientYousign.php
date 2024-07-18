@@ -22,6 +22,7 @@ use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
+use ComCompany\YousignBundle\Service\Utils\DateUtils;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -132,7 +133,7 @@ class ClientYousign implements ClientInterface
             throw new ApiException('create signature_requests error', 500);
         }
 
-        return new ProcedureResponse($response['id'], $response['status'], $response['expiration_date']);
+        return new ProcedureResponse($response['id'], $response['status'], DateUtils::toDatetime($response['expiration_date']));
     }
 
     public function sendSigner(string $procedureId, MemberDTO $member): SignerResponse
@@ -209,7 +210,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('Upload error', 500);
         }
 
-        return new DocumentResponse($responseYousign['id'], $responseYousign['total_pages'], $responseYousign['created_at']);
+        return new DocumentResponse($responseYousign['id'], $responseYousign['total_pages'], DateUtils::toDatetime($responseYousign['created_at']));
     }
 
     public function getProcedure(string $procedureId): SignatureResponse
@@ -226,8 +227,8 @@ class ClientYousign implements ClientInterface
 
         $signatureResponse = new SignatureResponse();
         $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate($response['created_at']);
-        $signatureResponse->setExpirationDate($response['expiration_date']);
+        $signatureResponse->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''));
+        $signatureResponse->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null);
         $signatureResponse->setWorkspaceId($response['workspace_id']);
         $signatureResponse->setStatus($response['status']);
 
@@ -243,7 +244,8 @@ class ClientYousign implements ClientInterface
         }
 
         if ($decline = $response['decline_information'] ?? false) {
-            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $decline['declined_at']));
+            $declinedAt = $decline['declined_at'] ? DateUtils::toDatetime($decline['declined_at']) : null;
+            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $declinedAt));
         }
 
         return $signatureResponse;
@@ -258,8 +260,8 @@ class ClientYousign implements ClientInterface
 
         $signatureResponse = new SignatureResponse();
         $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate($response['created_at']);
-        $signatureResponse->setExpirationDate($response['expiration_date']);
+        $signatureResponse->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''));
+        $signatureResponse->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null);
         $signatureResponse->setWorkspaceId($response['workspace_id']);
 
         foreach ($response['documents'] as $document) {
@@ -273,7 +275,8 @@ class ClientYousign implements ClientInterface
         }
 
         if ($decline = $response['decline_information'] ?? false) {
-            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $decline['declined_at']));
+            $declinedAt = $decline['declined_at'] ? DateUtils::toDatetime($decline['declined_at']) : null;
+            $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $declinedAt));
         }
 
         return $signatureResponse;
@@ -382,6 +385,7 @@ class ClientYousign implements ClientInterface
         return $errors;
     }
 
+    /**  @throws ClientException|ApiException */
     public function getAuditTrail(string $procedureId, string $signerId): AuditResponse
     {
         $response = $this->request(
@@ -403,13 +407,13 @@ class ClientYousign implements ClientInterface
         $audit->getSigner()->setLastname($signer['last_name']);
         $audit->getSigner()->setPhone($signer['phone_number']);
         $audit->getSigner()->setEmail($signer['email_address']);
-        $audit->getSigner()->setConsentGivenAt($signer['consent_given_at']);
-        $audit->getSigner()->setSignatureProcessCompleteAt($signer['signature_process_completed_at']);
+        $audit->getSigner()->setConsentGivenAt(DateUtils::toDatetime($signer['consent_given_at'] ?? ''));
+        $audit->getSigner()->setSignatureProcessCompleteAt(DateUtils::toDatetime($signer['signature_process_completed_at'] ?? ''));
 
         $audit->getSignatureRequest()->setId($signatureRequest['id']);
         $audit->getSignatureRequest()->setName($signatureRequest['name']);
-        $audit->getSignatureRequest()->setSentAt($signatureRequest['sent_at']);
-        $audit->getSignatureRequest()->setExpiredAt($signatureRequest['expired_at']);
+        $audit->getSignatureRequest()->setSentAt(DateUtils::toDatetime($signatureRequest['sent_at']));
+        $audit->getSignatureRequest()->setExpiredAt(DateUtils::toDatetime($signatureRequest['expired_at']));
 
         return $audit;
     }

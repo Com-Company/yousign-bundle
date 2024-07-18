@@ -19,8 +19,8 @@ class SignatureResponse
     private string $procedureId;
     private string $status;
     private string $procedureName;
-    private string $creationDate;
-    private ?string $expirationDate;
+    private \DateTime $creationDate;
+    private ?\DateTime $expirationDate;
     private ?string $workspaceId;
 
     /** @var Document[] */
@@ -51,22 +51,22 @@ class SignatureResponse
         $this->procedureName = $procedureName;
     }
 
-    public function getCreationDate(): string
+    public function getCreationDate(): \DateTime
     {
         return $this->creationDate;
     }
 
-    public function setCreationDate(string $creationDate): void
+    public function setCreationDate(\DateTime $creationDate): void
     {
         $this->creationDate = $creationDate;
     }
 
-    public function getExpirationDate(): ?string
+    public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(?string $expirationDate): void
+    public function setExpirationDate(?\DateTime $expirationDate): void
     {
         $this->expirationDate = $expirationDate;
     }
