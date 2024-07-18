@@ -79,10 +79,10 @@ class ClientYousign implements ClientInterface
         }
         $removePrefix = fn ($str) => substr($str, strrpos("/$str", '/') ?: 0);
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate(DateUtils::toDatetime($response['createdAt'] ?? ''));
-        $signatureResponse->setExpirationDate($response['expiresAt'] ? DateUtils::toDatetime($response['expiresAt']) : null);
-        $signatureResponse->setWorkspaceId($removePrefix($response['workspace_id']));
+        $signatureResponse->setProcedureId($response['id'])
+            ->setCreationDate(DateUtils::toDatetime($response['createdAt'] ?? ''))
+            ->setExpirationDate($response['expiresAt'] ? DateUtils::toDatetime($response['expiresAt']) : null)
+            ->setWorkspaceId($removePrefix($response['workspace_id']));
 
         foreach (($response['files'] ?? []) as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $removePrefix($document['id']), $document['type']));

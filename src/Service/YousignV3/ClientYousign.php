@@ -226,11 +226,11 @@ class ClientYousign implements ClientInterface
         }
 
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''));
-        $signatureResponse->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null);
-        $signatureResponse->setWorkspaceId($response['workspace_id']);
-        $signatureResponse->setStatus($response['status']);
+        $signatureResponse->setProcedureId($response['id'])
+            ->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''))
+            ->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null)
+            ->setWorkspaceId($response['workspace_id'])
+            ->setStatus($response['status']);
 
         foreach ($response['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
@@ -259,10 +259,10 @@ class ClientYousign implements ClientInterface
         }
 
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''));
-        $signatureResponse->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null);
-        $signatureResponse->setWorkspaceId($response['workspace_id']);
+        $signatureResponse->setProcedureId($response['id'])
+            ->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''))
+            ->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null)
+            ->setWorkspaceId($response['workspace_id']);
 
         foreach ($response['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
@@ -402,18 +402,20 @@ class ClientYousign implements ClientInterface
         }
 
         $audit = new AuditResponse();
-        $audit->getSigner()->setId($signer['id']);
-        $audit->getSigner()->setFirstname($signer['first_name']);
-        $audit->getSigner()->setLastname($signer['last_name']);
-        $audit->getSigner()->setPhone($signer['phone_number']);
-        $audit->getSigner()->setEmail($signer['email_address']);
-        $audit->getSigner()->setConsentGivenAt(DateUtils::toDatetime($signer['consent_given_at'] ?? ''));
-        $audit->getSigner()->setSignatureProcessCompleteAt(DateUtils::toDatetime($signer['signature_process_completed_at'] ?? ''));
+        $audit->getSigner()
+            ->setId($signer['id'])
+            ->setFirstname($signer['first_name'])
+            ->setLastname($signer['last_name'])
+            ->setPhone($signer['phone_number'])
+            ->setEmail($signer['email_address'])
+            ->setConsentGivenAt(DateUtils::toDatetime($signer['consent_given_at'] ?? ''))
+            ->setSignatureProcessCompleteAt(DateUtils::toDatetime($signer['signature_process_completed_at'] ?? ''));
 
-        $audit->getSignatureRequest()->setId($signatureRequest['id']);
-        $audit->getSignatureRequest()->setName($signatureRequest['name']);
-        $audit->getSignatureRequest()->setSentAt(DateUtils::toDatetime($signatureRequest['sent_at']));
-        $audit->getSignatureRequest()->setExpiredAt(DateUtils::toDatetime($signatureRequest['expired_at']));
+        $audit->getSignatureRequest()
+            ->setId($signatureRequest['id'])
+            ->setName($signatureRequest['name'])
+            ->setSentAt(DateUtils::toDatetime($signatureRequest['sent_at']))
+            ->setExpiredAt(DateUtils::toDatetime($signatureRequest['expired_at']));
 
         return $audit;
     }

@@ -25,9 +25,11 @@ final class Signer
         return $this->id;
     }
 
-    public function setId(string $id): void
+    public function setId(string $id): self
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getLastname(): string
@@ -35,9 +37,11 @@ final class Signer
         return $this->lastname;
     }
 
-    public function setLastname(string $lastname): void
+    public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
+
+        return $this;
     }
 
     public function getFirstname(): string
@@ -45,9 +49,11 @@ final class Signer
         return $this->firstname;
     }
 
-    public function setFirstname(string $firstname): void
+    public function setFirstname(string $firstname): self
     {
         $this->firstname = $firstname;
+
+        return $this;
     }
 
     public function getPhone(): string
@@ -55,9 +61,11 @@ final class Signer
         return $this->phone;
     }
 
-    public function setPhone(string $phone): void
+    public function setPhone(string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
     }
 
     public function getEmail(): string
@@ -65,9 +73,11 @@ final class Signer
         return $this->email;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
     }
 
     public function getConsentGivenAt(): \DateTime
@@ -75,9 +85,11 @@ final class Signer
         return $this->consentGivenAt;
     }
 
-    public function setConsentGivenAt(\DateTime $consentGivenAt): void
+    public function setConsentGivenAt(\DateTime $consentGivenAt): self
     {
         $this->consentGivenAt = $consentGivenAt;
+
+        return $this;
     }
 
     public function getSignatureProcessCompleteAt(): \DateTime
@@ -85,9 +97,11 @@ final class Signer
         return $this->signatureProcessCompleteAt;
     }
 
-    public function setSignatureProcessCompleteAt(\DateTime $signatureProcessCompleteAt): void
+    public function setSignatureProcessCompleteAt(\DateTime $signatureProcessCompleteAt): self
     {
         $this->signatureProcessCompleteAt = $signatureProcessCompleteAt;
+
+        return $this;
     }
 
     /** @return mixed[] */

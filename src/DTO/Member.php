@@ -114,8 +114,10 @@ class Member
     /**
      * @param array<string, mixed> $field
      */
-    public function addField(array $field): void
+    public function addField(array $field): self
     {
         $this->fields[] = $field;
+
+        return $this;
     }
 }
