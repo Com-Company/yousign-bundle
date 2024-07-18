@@ -75,8 +75,6 @@ class Member
                 return self::SIGNED;
             case 'refused':
                 return self::DECLINED;
-            case 'underage_not_eligible':
-                return self::ERROR;
             default:
                 return $status;
         }

@@ -24,9 +24,11 @@ class FieldLocation
         return $this->member;
     }
 
-    public function setMember(Member $member): void
+    public function setMember(Member $member): self
     {
         $this->member = $member;
+
+        return $this;
     }
 
     public function getDocument(): Document
@@ -34,9 +36,11 @@ class FieldLocation
         return $this->document;
     }
 
-    public function setDocument(Document $document): void
+    public function setDocument(Document $document): self
     {
         $this->document = $document;
+
+        return $this;
     }
 
     public function getLocation(): Field
@@ -44,9 +48,11 @@ class FieldLocation
         return $this->location;
     }
 
-    public function setLocation(Field $location): void
+    public function setLocation(Field $location): self
     {
         $this->location = $location;
+
+        return $this;
     }
 
     /** @return array<string, mixed> */

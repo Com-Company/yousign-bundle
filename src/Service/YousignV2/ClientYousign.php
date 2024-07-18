@@ -19,6 +19,7 @@ use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Service\ClientInterface;
+use ComCompany\YousignBundle\Service\Utils\DateUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ClientYousign implements ClientInterface
@@ -78,10 +79,10 @@ class ClientYousign implements ClientInterface
         }
         $removePrefix = fn ($str) => substr($str, strrpos("/$str", '/') ?: 0);
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id']);
-        $signatureResponse->setCreationDate($response['createdAt']);
-        $signatureResponse->setExpirationDate($response['expiresAt']);
-        $signatureResponse->setWorkspaceId($removePrefix($response['workspace_id']));
+        $signatureResponse->setProcedureId($response['id'])
+            ->setCreationDate(DateUtils::toDatetime($response['createdAt'] ?? ''))
+            ->setExpirationDate($response['expiresAt'] ? DateUtils::toDatetime($response['expiresAt']) : null)
+            ->setWorkspaceId($removePrefix($response['workspace_id']));
 
         foreach (($response['files'] ?? []) as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $removePrefix($document['id']), $document['type']));

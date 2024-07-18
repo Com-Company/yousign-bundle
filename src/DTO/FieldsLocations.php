@@ -7,9 +7,11 @@ class FieldsLocations
     /** @var FieldLocation[] */
     private array $fieldsLocations = [];
 
-    public function addField(FieldLocation $fieldLocation): void
+    public function addField(FieldLocation $fieldLocation): self
     {
         $this->fieldsLocations[] = $fieldLocation;
+
+        return $this;
     }
 
     /** @return FieldLocation[] */

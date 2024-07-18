@@ -8,9 +8,9 @@ class DeclineInformation
 {
     private ?string $reason;
     private ?string $signerId;
-    private ?string $declinedAt;
+    private ?\DateTime $declinedAt;
 
-    public function __construct(?string $reason = null, ?string $signerId = null, ?string $declinedAt = null)
+    public function __construct(?string $reason = null, ?string $signerId = null, ?\DateTime $declinedAt = null)
     {
         $this->reason = $reason;
         $this->declinedAt = $declinedAt;
@@ -27,7 +27,7 @@ class DeclineInformation
         return $this->signerId;
     }
 
-    public function getDeclinedAt(): ?string
+    public function getDeclinedAt(): ?\DateTime
     {
         return $this->declinedAt;
     }

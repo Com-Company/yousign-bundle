@@ -19,8 +19,8 @@ class SignatureResponse
     private string $procedureId;
     private string $status;
     private string $procedureName;
-    private string $creationDate;
-    private ?string $expirationDate;
+    private \DateTime $creationDate;
+    private ?\DateTime $expirationDate;
     private ?string $workspaceId;
 
     /** @var Document[] */
@@ -36,9 +36,11 @@ class SignatureResponse
         return $this->status;
     }
 
-    public function setStatus(string $status): void
+    public function setStatus(string $status): self
     {
         $this->status = $this->processStatus($status);
+
+        return $this;
     }
 
     public function getProcedureName(): string
@@ -46,29 +48,35 @@ class SignatureResponse
         return $this->procedureName;
     }
 
-    public function setProcedureName(string $procedureName): void
+    public function setProcedureName(string $procedureName): self
     {
         $this->procedureName = $procedureName;
+
+        return $this;
     }
 
-    public function getCreationDate(): string
+    public function getCreationDate(): \DateTime
     {
         return $this->creationDate;
     }
 
-    public function setCreationDate(string $creationDate): void
+    public function setCreationDate(\DateTime $creationDate): self
     {
         $this->creationDate = $creationDate;
+
+        return $this;
     }
 
-    public function getExpirationDate(): ?string
+    public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
     }
 
-    public function setExpirationDate(?string $expirationDate): void
+    public function setExpirationDate(?\DateTime $expirationDate): self
     {
         $this->expirationDate = $expirationDate;
+
+        return $this;
     }
 
     public function getWorkspaceId(): ?string
@@ -76,14 +84,18 @@ class SignatureResponse
         return $this->workspaceId;
     }
 
-    public function setWorkspaceId(?string $workspaceId): void
+    public function setWorkspaceId(?string $workspaceId): self
     {
         $this->workspaceId = $workspaceId;
+
+        return $this;
     }
 
-    public function addDocument(Document $document): void
+    public function addDocument(Document $document): self
     {
         $this->documents[] = $document;
+
+        return $this;
     }
 
     /** @return Document[] */
@@ -92,9 +104,11 @@ class SignatureResponse
         return $this->documents;
     }
 
-    public function addMember(Member $member): void
+    public function addMember(Member $member): self
     {
         $this->members[] = $member;
+
+        return $this;
     }
 
     /** @return Member[] */
@@ -103,9 +117,11 @@ class SignatureResponse
         return $this->members;
     }
 
-    public function setProcedureId(string $procedureId): void
+    public function setProcedureId(string $procedureId): self
     {
         $this->procedureId = $procedureId;
+
+        return $this;
     }
 
     public function getProcedureId(): string
@@ -118,9 +134,11 @@ class SignatureResponse
         return $this->declineInformation;
     }
 
-    public function setDeclineInformation(?DeclineInformation $declineInformation): void
+    public function setDeclineInformation(?DeclineInformation $declineInformation): self
     {
         $this->declineInformation = $declineInformation;
+
+        return $this;
     }
 
     public function processStatus(string $status): string

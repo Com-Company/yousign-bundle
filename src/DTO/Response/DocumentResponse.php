@@ -9,9 +9,9 @@ class DocumentResponse
     private string $id;
     private int $totalPages;
 
-    private string $createdAt;
+    private \DateTime $createdAt;
 
-    public function __construct(string $id, int $totalPages, string $createdAt)
+    public function __construct(string $id, int $totalPages, \DateTime $createdAt)
     {
         $this->id = $id;
         $this->totalPages = $totalPages;
@@ -28,7 +28,7 @@ class DocumentResponse
         return $this->totalPages;
     }
 
-    public function getCreatedAt(): string
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
