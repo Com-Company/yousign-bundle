@@ -5,6 +5,7 @@ namespace ComCompany\YousignBundle\Service;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
+use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -39,8 +40,14 @@ interface ClientInterface
     /** Create a new Signer. */
     public function sendSigner(string $procedureId, Member $member): SignerResponse;
 
-    /** Create a follower. */
-    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): FollowerResponse;
+    /**
+     * Create a follower.
+     *
+     * @param Follower[] $followers
+     *
+     * @return FollowerResponse[]
+     */
+    public function sendFollowers(string $procedureId, iterable $followers): iterable;
 
     /**
      * Add fields.

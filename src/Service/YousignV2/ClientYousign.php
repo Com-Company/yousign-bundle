@@ -5,6 +5,7 @@ namespace ComCompany\YousignBundle\Service\YousignV2;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
+use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -51,8 +52,12 @@ class ClientYousign implements ClientInterface
         throw new ClientException("'sendSigner' method is no longer implemented for this Yousing v2.", 501);
     }
 
-    /** @throws ClientException */
-    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): FollowerResponse
+    /** @param Follower[] $followers
+     * @return FollowerResponse[]
+     *
+     * @throws ClientException
+     */
+    public function sendFollowers(string $procedureId, $followers): iterable
     {
         throw new ClientException("'sendFollower' method is no longer implemented for this Yousing v2.", 501);
     }
