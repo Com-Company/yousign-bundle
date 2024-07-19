@@ -5,6 +5,7 @@ namespace ComCompany\YousignBundle\Service\YousignV3;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
+use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -161,20 +162,25 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function sendFollower(string $procedureId, string $email, string $locale = 'fr'): FollowerResponse
+    /**
+     * @param Follower[] $followers
+     *
+     * @return FollowerResponse[]
+     */
+    public function sendFollowers(string $procedureId, iterable $followers, string $locale = 'fr'): iterable
     {
+        $followersArray = is_array($followers) ? $followers : iterator_to_array($followers);
+
         $uri = 'signature_requests/'.$procedureId.'/followers';
         $response = $this->request('POST', $uri, [
-            'body' => json_encode([
-                'email' => $email,
-                'locale' => $locale,
-            ], JSON_THROW_ON_ERROR),
+            'body' => json_encode(array_map(static fn ($follower) => $follower->toArray(), $followersArray), JSON_THROW_ON_ERROR),
         ]);
+
         if (!is_array($response)) {
             throw new ApiException('Create follower error');
         }
 
-        return new FollowerResponse($response['email'], $response['locale'], $response['follower_link']);
+        return array_map(static fn ($follower) => new FollowerResponse($follower['email'], $follower['locale'], $follower['follower_link']), $response);
     }
 
     public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
@@ -376,7 +382,8 @@ class ClientYousign implements ClientInterface
         if (is_array($errorsDatas['invalid_params'] ?? false)) {
             $errors['errors'] = array_map(static function ($item) {
                 return ($item['name'] && $item['reason']) ? [
-                    'name' => (preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1] : $item['name'],
+                    // if name contains '].' like [0].email is mostly an error on specific key in sended array; othervise it's a field name in nested element like info[email]
+                    'name' => (false !== strpos($item['name'], '].')) ? $item['name'] : ((preg_match('/\[(.*?)\]/', $item['name'], $matches)) ? $matches[1] : $item['name']),
                     'reason' => $item['reason'],
                 ] : $item;
             }, $errorsDatas['invalid_params']);
