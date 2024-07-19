@@ -87,6 +87,7 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setProcedureId($response['id'])
             ->setCreationDate(DateUtils::toDatetime($response['createdAt'] ?? ''))
             ->setExpirationDate($response['expiresAt'] ? DateUtils::toDatetime($response['expiresAt']) : null)
+            ->setFinishedAt($response['finishedAt'] ? DateUtils::toDatetime($response['finishedAt']) : null)
             ->setWorkspaceId($removePrefix($response['workspace_id']));
 
         foreach (($response['files'] ?? []) as $document) {

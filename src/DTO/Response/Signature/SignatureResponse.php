@@ -17,10 +17,17 @@ class SignatureResponse
     private const STATUS_DONE = 'done';
 
     private string $procedureId;
+
     private string $status;
+
     private string $procedureName;
+
     private \DateTime $creationDate;
+
     private ?\DateTime $expirationDate;
+
+    private ?\DateTime $finishedAt;
+
     private ?string $workspaceId;
 
     /** @var Document[] */
@@ -75,6 +82,28 @@ class SignatureResponse
     public function setExpirationDate(?\DateTime $expirationDate): self
     {
         $this->expirationDate = $expirationDate;
+
+        return $this;
+    }
+
+    /**
+     * Will be removed in V3.
+     *
+     * @deprecated
+     */
+    public function getFinishedAt(): ?\DateTime
+    {
+        return $this->finishedAt;
+    }
+
+    /**
+     * Will be removed in V3.
+     *
+     * @deprecated
+     */
+    public function setFinishedAt(?\DateTime $finishedAt): self
+    {
+        $this->finishedAt = $finishedAt;
 
         return $this;
     }
