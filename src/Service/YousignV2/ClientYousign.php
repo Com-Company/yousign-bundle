@@ -84,7 +84,7 @@ class ClientYousign implements ClientInterface
         }
         $removePrefix = fn ($str) => substr($str, strrpos("/$str", '/') ?: 0);
         $signatureResponse = new SignatureResponse();
-        $workspace = ($response['workspace'] ?? false) ? $removePrefix($response) : null;
+        $workspace = ($response['workspace'] ?? false) ? $removePrefix($response['workspace']) : null;
         $signatureResponse->setProcedureId($response['id'])
             ->setCreationDate(DateUtils::toDatetime($response['createdAt'] ?? ''))
             ->setStatus($response['status'])
@@ -120,12 +120,16 @@ class ClientYousign implements ClientInterface
         }
 
         $response = $this->httpClient->request('GET', $documentId.'/download');
-
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
         }
 
-        return $response->getContent(false);
+        $data = base64_decode($response->getContent(false), true);
+        if (!is_string($data)) {
+            throw new ApiException('Invalid file content received');
+        }
+
+        return $data;
     }
 
     public function getProof(string $procedureId, string $signerId): string
