@@ -154,7 +154,7 @@ class ClientYousign implements ClientInterface
             $error = $e->getErrors();
             $error['member'] = [
                 'first_name' => $member->getFirstName(),
-                'last_name' => $member->getFirstName(),
+                'last_name' => $member->getLastName(),
                 'email' => $member->getEmail(),
                 'phone' => $member->getPhone(),
             ];

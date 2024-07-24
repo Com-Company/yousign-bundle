@@ -12,7 +12,7 @@ class Member
 
     private string $email;
 
-    private string $phone;
+    private ?string $phone;
 
     /** @var array<string, mixed> */
     private array $extraConfig;
@@ -30,7 +30,7 @@ class Member
         string $firstName,
         string $lastName,
         string $email,
-        string $phone,
+        ?string $phone = null,
         array $fields = [],
         array $extraConfig = [],
         ?MemberConfig $config = null,
@@ -95,7 +95,7 @@ class Member
         return $this->email;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

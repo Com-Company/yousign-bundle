@@ -8,7 +8,7 @@ class Follower
 
     private string $locale;
 
-    public function __construct(string $email, string $locale)
+    public function __construct(string $email, string $locale = 'fr')
     {
         $this->email = $email;
         $this->locale = $locale;

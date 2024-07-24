@@ -124,7 +124,7 @@ class ClientYousign implements ClientInterface
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
         }
 
-        $data = base64_decode($response->getContent(false), true);
+        $data = base64_decode($response->getContent(false));
         if (!is_string($data)) {
             throw new ApiException('Invalid file content received');
         }
