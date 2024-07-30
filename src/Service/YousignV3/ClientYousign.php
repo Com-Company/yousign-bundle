@@ -245,7 +245,16 @@ class ClientYousign implements ClientInterface
         $signers = $this->request('GET', "signature_requests/{$procedureId}/signers");
         if (is_array($signers) && !empty($signers)) {
             foreach ($signers as $signer) {
-                $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
+                $signatureResponse->addMember(new Member(
+                    null,
+                    $signer['id'],
+                    $signer['status'],
+                    $signer['signature_link'],
+                    $signer['info']['first_name'] ?? null,
+                    $signer['info']['last_name'] ?? null,
+                    $signer['info']['email'] ?? null,
+                    $signer['info']['phone_number'] ?? null,
+                ));
             }
         }
 
@@ -268,7 +277,8 @@ class ClientYousign implements ClientInterface
         $signatureResponse->setProcedureId($response['id'])
             ->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''))
             ->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null)
-            ->setWorkspaceId($response['workspace_id']);
+            ->setWorkspaceId($response['workspace_id'])
+            ->setStatus($response['status']);
 
         foreach ($response['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
@@ -353,7 +363,7 @@ class ClientYousign implements ClientInterface
      *
      * @return array<mixed, mixed>|string
      */
-    private function request(string $method, string $url, array $options = [])
+    public function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
         if (300 <= $response->getStatusCode()) {

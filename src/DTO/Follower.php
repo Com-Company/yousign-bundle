@@ -24,6 +24,20 @@ class Follower
         return $this->locale;
     }
 
+    public function setEmail(string $email): Follower
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function setLocale(string $locale): Follower
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */

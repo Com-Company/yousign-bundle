@@ -111,6 +111,64 @@ class Member
         return $this->config;
     }
 
+    public function setId(?string $id): Member
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function setFirstName(string $firstName): Member
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function setLastName(string $lastName): Member
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function setEmail(string $email): Member
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function setPhone(?string $phone): Member
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /** @param array<string, mixed> $extraConfig*/
+    public function setExtraConfig(array $extraConfig): Member
+    {
+        $this->extraConfig = $extraConfig;
+
+        return $this;
+    }
+
+    public function setConfig(?MemberConfig $config): Member
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /** @param array<int, array<string, mixed>> $fields */
+    public function setFields(array $fields): Member
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
     /**
      * @param array<string, mixed> $field
      */

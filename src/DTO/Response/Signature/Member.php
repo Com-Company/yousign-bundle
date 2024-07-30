@@ -25,13 +25,34 @@ class Member
 
     private ?string $comment = null;
 
-    public function __construct(?string $id, string $supplierId, string $status, ?string $uri = null, ?string $comment = null)
-    {
+    private ?string $firstname;
+
+    private ?string $lastname;
+
+    private ?string $email;
+
+    private ?string $phone;
+
+    public function __construct(
+        ?string $id,
+        string $supplierId,
+        string $status,
+        ?string $uri = null,
+        ?string $comment = null,
+        ?string $firstname = null,
+        ?string $lastname = null,
+        ?string $email = null,
+        ?string $phone = null
+    ) {
         $this->id = $id;
         $this->supplierId = $supplierId;
         $this->status = $this->processStatus($status);
         $this->uri = $uri;
         $this->comment = $comment;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->phone = $phone;
+        $this->email = $email;
     }
 
     public function getId(): ?string
@@ -62,6 +83,26 @@ class Member
     public function getComment(): ?string
     {
         return $this->comment;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
     }
 
     public function processStatus(string $status): string

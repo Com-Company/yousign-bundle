@@ -174,7 +174,7 @@ class ClientYousign implements ClientInterface
      *
      * @return array<mixed, mixed>|string
      */
-    private function request(string $method, string $url, array $options = [])
+    public function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
         if (300 <= $response->getStatusCode()) {

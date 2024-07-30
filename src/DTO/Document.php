@@ -46,6 +46,41 @@ class Document
         return $this->mimeType;
     }
 
+    public function setName(string $name): Document
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function setPath(string $path): Document
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    public function setNature(string $nature): Document
+    {
+        $this->nature = $nature;
+
+        return $this;
+    }
+
+    public function setId(?string $id): Document
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    public function setMimeType(?string $mimeType): Document
+    {
+        $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
     /** @return array<string, mixed> */
     public function toArray()
     {
