@@ -18,6 +18,8 @@ class WebhookPayload
 
     private ?string $workspaceId;
 
+    private ?string $externalId;
+
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
@@ -28,7 +30,8 @@ class WebhookPayload
         string $status,
         array $members = [],
         array $files = [],
-        ?string $workspaceId = null
+        ?string $workspaceId = null,
+        ?string $externalId = null
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -36,6 +39,7 @@ class WebhookPayload
         $this->members = $members;
         $this->files = $files;
         $this->workspaceId = $workspaceId ?? null;
+        $this->externalId = $externalId ?? null;
     }
 
     public function getId(): string
@@ -72,6 +76,11 @@ class WebhookPayload
     public function getWorkspaceId(): ?string
     {
         return $this->workspaceId;
+    }
+
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
     }
 
     /** @return array<string, mixed> */
