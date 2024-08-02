@@ -58,7 +58,7 @@ services:
 
     ComCompany\YousignBundle\Service\YousignV2\ClientYousign:
         tags:
-            - { name: 'yousign.client_implementation', key: 'v3' }
+            - { name: 'yousign.client_implementation', key: 'v2' }
         arguments:
             $httpClient: '@yousign_bundle.v2_client'
         calls:
