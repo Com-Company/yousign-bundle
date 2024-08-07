@@ -250,6 +250,7 @@ class ClientYousign implements ClientInterface
                     $signer['id'],
                     $signer['status'],
                     $signer['signature_link'],
+                    null,
                     $signer['info']['first_name'] ?? null,
                     $signer['info']['last_name'] ?? null,
                     $signer['info']['email'] ?? null,
