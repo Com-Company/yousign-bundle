@@ -328,7 +328,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('signerId is required');
         }
 
-        $response = $this->httpClient->request('GET', 'signature_requests/{$procedureId}/signers/{$signerId}/audit_trails/download');
+        $response = $this->httpClient->request('GET', "signature_requests/{$procedureId}/signers/{$signerId}/audit_trails/download");
 
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
