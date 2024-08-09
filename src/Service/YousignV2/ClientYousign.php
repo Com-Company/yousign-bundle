@@ -119,7 +119,7 @@ class ClientYousign implements ClientInterface
             throw new ClientException('documentId is required');
         }
 
-        $response = $this->httpClient->request('GET', $documentId.'/download');
+        $response = $this->httpClient->request('GET', "files/{$documentId}/download");
         if (300 <= $response->getStatusCode()) {
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
         }
@@ -172,7 +172,7 @@ class ClientYousign implements ClientInterface
     /**
      * @param array<string, mixed> $options
      *
-     * @return array<mixed, mixed>|string
+     * @return array<mixed, mixed>|string|null
      */
     public function request(string $method, string $url, array $options = [])
     {
@@ -181,7 +181,8 @@ class ClientYousign implements ClientInterface
             throw new ApiException($response->getContent(false), $response->getStatusCode(), null, json_decode($response->getContent(false), true));
         }
 
-        if (($data = json_decode($response->getContent(false), true)) === null) {
+        $content = $response->getContent(false);
+        if (($data = json_decode($content, true)) === null && $content) {
             throw new ClientException('Error get result', $response->getStatusCode(), null, []);
         }
 
