@@ -19,6 +19,7 @@ use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ClientException;
+use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
 use ComCompany\YousignBundle\Service\Utils\DateUtils;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -152,9 +153,10 @@ class ClientYousign implements ClientInterface
 
     public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void
     {
-        $response = $this->request('DELETE', 'procedures/'.$procedureId);
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
-            throw new ApiException('Cancel signature error', 500);
+        try  {
+            $this->request('DELETE', 'procedures/'.$procedureId);
+        } catch (YousignException $e) {
+            throw new ApiException('Cancel procedure error', 500, $e, ['errors' => $e->getErrors(), 'message' => $e->getMessage()]);
         }
     }
 
