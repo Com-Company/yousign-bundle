@@ -354,9 +354,23 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function archiveDocument(string $fileName, string $content): void
+    public function archiveDocument(string $workspaceId, Document $document): DocumentResponse
     {
-        // Not yet implemented in V3
+        $file = new \SplFileInfo($document->getPath());
+        $formData = new FormDataPart([
+            'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
+            'workspace_id' => $workspaceId,
+        ]);
+        $header = $formData->getPreparedHeaders();
+        $responseYousign = $this->request('POST', 'archives', [
+            'headers' => $header->toArray(),
+            'body' => $formData->toIterable(),
+        ]);
+        if (!is_array($responseYousign) || empty($responseYousign['id']) || !is_string($responseYousign['id'])) {
+            throw new ClientException('Upload archiveDocument error', 500);
+        }
+
+        return new DocumentResponse($responseYousign['id'], 0, DateUtils::toDatetime($responseYousign['created_at']));
     }
 
     /**
