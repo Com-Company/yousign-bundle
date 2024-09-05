@@ -152,12 +152,13 @@ class ClientYousign implements ClientInterface
         if (!is_string($data)) {
             throw new ApiException('Invalid file content received');
         }
+
         return $data;
     }
 
     public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void
     {
-        try  {
+        try {
             $this->request('DELETE', 'procedures/'.$procedureId);
         } catch (YousignException $e) {
             throw new ApiException('Cancel procedure error', 500, $e, ['errors' => $e->getErrors(), 'message' => $e->getMessage()]);

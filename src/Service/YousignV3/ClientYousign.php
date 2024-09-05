@@ -338,6 +338,7 @@ class ClientYousign implements ClientInterface
         if (!is_string($data)) {
             throw new ApiException('Invalid file content received');
         }
+
         return $data;
     }
 
