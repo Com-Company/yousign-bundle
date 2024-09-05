@@ -334,7 +334,11 @@ class ClientYousign implements ClientInterface
             throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
         }
 
-        return $response->getContent(false);
+        $data = base64_decode($response->getContent());
+        if (!is_string($data)) {
+            throw new ApiException('Invalid file content received');
+        }
+        return $data;
     }
 
     public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void
