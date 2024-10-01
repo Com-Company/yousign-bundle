@@ -99,7 +99,17 @@ class ClientYousign implements ClientInterface
 
         foreach (($response['members'] ?? []) as $member) {
             $signUri = ($this->appUri ?? '')."/procedure/sign?members={$member['id']}";
-            $signatureResponse->addMember(new Member(null, $removePrefix($member['id']), $member['status'], $signUri, $member['comment'] ?? null));
+            $signatureResponse->addMember(new Member(
+                null,
+                $removePrefix($member['id']),
+                $member['status'],
+                $signUri,
+                $member['comment'] ?? null,
+                $member['firstname'],
+                $member['lastname'],
+                $member['email'] ?? null,
+                $member['phone'] ?? null)
+            );
         }
 
         return $signatureResponse;
