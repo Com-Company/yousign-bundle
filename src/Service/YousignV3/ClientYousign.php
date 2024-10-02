@@ -20,6 +20,7 @@ use ComCompany\YousignBundle\DTO\Response\Signature\Member;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
+use ComCompany\YousignBundle\Exception\ApiRateLimitException;
 use ComCompany\YousignBundle\Exception\ClientException;
 use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
@@ -383,6 +384,10 @@ class ClientYousign implements ClientInterface
         $response = $this->httpClient->request($method, $url, $options);
         if (300 <= $response->getStatusCode()) {
             $errors = $this->handleError($response->getContent(false));
+            if (429 === $response->getStatusCode()) {
+                throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement', $response->getStatusCode(), null, $errors);
+            }
+
             throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors);
         }
 
@@ -402,7 +407,7 @@ class ClientYousign implements ClientInterface
         $errorsDatas = json_decode($response, true);
 
         $errors = [];
-        $errors['message'] = $errorsDatas['detail'] ?? '';
+        $errors['message'] = $errorsDatas['detail'] ?? ($errorsDatas['message'] ?? $response);
 
         if (is_array($errorsDatas['invalid_params'] ?? false)) {
             $errors['errors'] = array_map(static function ($item) {
