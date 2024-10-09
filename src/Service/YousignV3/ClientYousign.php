@@ -355,6 +355,18 @@ class ClientYousign implements ClientInterface
         }
     }
 
+    public function deleteProcedure(string $procedureId): void
+    {
+        if (!$procedureId) {
+            throw new ClientException('procedureId is required');
+        }
+
+        $response = $this->httpClient->request('DELETE', "signature_requests/{$procedureId}");
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error deleting procedure Request: '.$response->getContent(false), $response->getStatusCode());
+        }
+    }
+
     public function archiveDocument(string $workspaceId, Document $document): DocumentResponse
     {
         $file = new \SplFileInfo($document->getPath());
@@ -382,6 +394,7 @@ class ClientYousign implements ClientInterface
     public function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
+
         if (300 <= $response->getStatusCode()) {
             $errors = $this->handleError($response->getContent(false));
             if (429 === $response->getStatusCode()) {
@@ -455,5 +468,10 @@ class ClientYousign implements ClientInterface
             ->setExpiredAt(DateUtils::toDatetime($signatureRequest['expired_at']));
 
         return $audit;
+    }
+
+    public function checkRib(string $path): string
+    {
+        throw new ClientException("'checkRib' method is not implemented for this Yousing v3.", 501);
     }
 }

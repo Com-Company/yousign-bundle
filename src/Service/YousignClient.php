@@ -83,6 +83,11 @@ class YousignClient implements ClientInterface
         $this->getInstance($version)->cancelProcedure($procedureId, $reason, $customNote);
     }
 
+    public function deleteProcedure(string $procedureId, string $version = Versions::V3): void
+    {
+        $this->getInstance($version)->deleteProcedure($procedureId);
+    }
+
     public function downloadDocument(string $procedureId, string $documentId, string $version = Versions::V3): string
     {
         return $this->getInstance($version)->downloadDocument($procedureId, $documentId);
@@ -96,5 +101,10 @@ class YousignClient implements ClientInterface
     public function getAuditTrail(string $procedureId, string $signerId, string $version = Versions::V3): AuditResponse
     {
         return $this->getInstance($version)->getAuditTrail($procedureId, $signerId);
+    }
+
+    public function checkRib(string $path, string $version = Versions::V2): string
+    {
+        return $this->getInstance($version)->checkRib($path);
     }
 }
