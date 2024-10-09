@@ -75,13 +75,23 @@ interface ClientInterface
     public function getProcedure(string $procedureId): SignatureResponse;
 
     /**
-     * Delete a Signature Request.
+     * Cancel a Signature Request.
      */
     public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void;
+
+    /**
+     * Delete a Signature Request.
+     */
+    public function deleteProcedure(string $procedureId): void;
 
     /** Get a Document. */
     public function downloadDocument(string $procedureId, string $documentId): string;
 
     /** Get an Audit Trail (useful to get Signature date in yousign V3). */
     public function getAuditTrail(string $procedureId, string $signerId): AuditResponse;
+
+    /**
+     * Check RIB document
+     */
+    public function checkRib(string $path): bool;
 }

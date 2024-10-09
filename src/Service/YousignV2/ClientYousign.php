@@ -175,6 +175,11 @@ class ClientYousign implements ClientInterface
         }
     }
 
+    public function deleteProcedure(string $procedureId): void
+    {
+        throw new ClientException("'deleteProcedure' method is no longer implemented for this Yousing v2.", 501);
+    }
+
     public function archiveDocument(string $fileName, string $content): void
     {
         $response = $this->request('POST', 'archives', ['json' => [
@@ -183,6 +188,19 @@ class ClientYousign implements ClientInterface
         ]]);
         if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
             throw new ApiException('Archive Document error', 500);
+        }
+    }
+
+    public function checkRib(string $path): bool
+    {
+        try {
+            $responseYousign = $this->request('POST', 'check-document/bank_accounts', [
+                'body' => json_encode(['file' => base64_encode(file_get_contents($path))])
+            ]);
+
+            return $responseYousign['ibanValid'] ?? false;
+        } catch (YousignException $e) {
+            throw new ApiException('checkRib error', 500, $e, ['errors' => $e->getErrors(), 'message' => $e->getMessage()]);
         }
     }
 
