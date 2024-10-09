@@ -361,10 +361,10 @@ class ClientYousign implements ClientInterface
             throw new ClientException('procedureId is required');
         }
 
-        $this->request(
-            'DELETE',
-            "signature_requests/{$procedureId}"
-        );
+        $response = $this->httpClient->request('DELETE', "signature_requests/{$procedureId}");
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error deleting procedure Request: '.$response->getContent(false), $response->getStatusCode());
+        }
     }
 
     public function archiveDocument(string $workspaceId, Document $document): DocumentResponse
@@ -394,6 +394,7 @@ class ClientYousign implements ClientInterface
     public function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
+
         if (300 <= $response->getStatusCode()) {
             $errors = $this->handleError($response->getContent(false));
             if (429 === $response->getStatusCode()) {
