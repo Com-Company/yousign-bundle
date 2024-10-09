@@ -93,5 +93,5 @@ interface ClientInterface
     /**
      * Check RIB document
      */
-    public function checkRib(string $path): bool;
+    public function checkRib(string $path): string;
 }

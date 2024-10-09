@@ -103,7 +103,7 @@ class YousignClient implements ClientInterface
         return $this->getInstance($version)->getAuditTrail($procedureId, $signerId);
     }
 
-    public function checkRib(string $path, string $version = Versions::V2): bool
+    public function checkRib(string $path, string $version = Versions::V2): string
     {
         return $this->getInstance($version)->checkRib($path);
     }

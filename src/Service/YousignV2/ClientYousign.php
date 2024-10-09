@@ -191,14 +191,14 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function checkRib(string $path): bool
+    public function checkRib(string $path): string
     {
         try {
             $responseYousign = $this->request('POST', 'check-document/bank_accounts', [
                 'body' => json_encode(['file' => base64_encode(file_get_contents($path))])
             ]);
 
-            return $responseYousign['ibanValid'] ?? false;
+            return $responseYousign['extractedIban'] ?? '';
         } catch (YousignException $e) {
             throw new ApiException('checkRib error', 500, $e, ['errors' => $e->getErrors(), 'message' => $e->getMessage()]);
         }

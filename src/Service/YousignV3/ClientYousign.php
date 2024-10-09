@@ -469,7 +469,7 @@ class ClientYousign implements ClientInterface
         return $audit;
     }
 
-    public function checkRib(string $path): bool
+    public function checkRib(string $path): string
     {
         throw new ClientException("'checkRib' method is not implemented for this Yousing v3.", 501);
     }
