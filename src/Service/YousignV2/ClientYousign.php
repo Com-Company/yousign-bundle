@@ -193,9 +193,14 @@ class ClientYousign implements ClientInterface
 
     public function checkRib(string $path): string
     {
+        $fileContent = file_get_contents($path);
+        if (false === $fileContent) {
+            throw new ClientException("Impossible de lire le fichier rib: $path");
+        }
+
         try {
             $responseYousign = $this->request('POST', 'check-document/bank_accounts', [
-                'body' => json_encode(['file' => base64_encode(file_get_contents($path))]),
+                'body' => json_encode(['file' => base64_encode($fileContent)]),
             ]);
 
             return $responseYousign['extractedIban'] ?? '';

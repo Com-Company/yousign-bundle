@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ComCompany\YousignBundle\DTO\Response\Signature;
 
+use ComCompany\YousignBundle\DTO\Response\RateLimit;
+
 class SignatureResponse
 {
     private const STATUS_DRAFT = 'draft';
@@ -37,6 +39,8 @@ class SignatureResponse
     private array $members = [];
 
     private ?DeclineInformation $declineInformation = null;
+
+    private ?RateLimit $rateLimit = null;
 
     public function getStatus(): string
     {
@@ -166,6 +170,18 @@ class SignatureResponse
     public function setDeclineInformation(?DeclineInformation $declineInformation): self
     {
         $this->declineInformation = $declineInformation;
+
+        return $this;
+    }
+
+    public function getRateLimit(): ?RateLimit
+    {
+        return $this->rateLimit;
+    }
+
+    public function setRateLimit(?RateLimit $rateLimit): self
+    {
+        $this->rateLimit = $rateLimit;
 
         return $this;
     }

@@ -14,6 +14,7 @@ use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
+use ComCompany\YousignBundle\DTO\Response\RateLimit as RateLimitDTO;
 use ComCompany\YousignBundle\DTO\Response\Signature\DeclineInformation;
 use ComCompany\YousignBundle\DTO\Response\Signature\Document as SignatureDocumentResponse;
 use ComCompany\YousignBundle\DTO\Response\Signature\Member;
@@ -131,11 +132,15 @@ class ClientYousign implements ClientInterface
             'body' => json_encode($configData, JSON_THROW_ON_ERROR),
         ]);
 
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ApiException('create signature_requests error', 500);
         }
 
-        return new ProcedureResponse($response['id'], $response['status'], DateUtils::toDatetime($response['expiration_date']));
+        $rateLimit = $datas['rateLimit'] ?? null;
+        $rateLimit ? new RateLimitDTO($rateLimit['limitHour'], $rateLimit['remainingHour'], $rateLimit['limitMinute'], $rateLimit['remainingMinute']) : null;
+
+        return new ProcedureResponse($datas['id'], $datas['status'], DateUtils::toDatetime($datas['expiration_date']), $rateLimit);
     }
 
     public function sendSigner(string $procedureId, MemberDTO $member): SignerResponse
@@ -145,12 +150,12 @@ class ClientYousign implements ClientInterface
             $response = $this->request('POST', $uri, [
                 'body' => json_encode($member->formattedForApi(), JSON_THROW_ON_ERROR),
             ]);
-
-            if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+            $datas = $response['datas'] ?? [];
+            if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
                 throw new ApiException('Create signer error');
             }
 
-            return new SignerResponse($response['id'], $response['status']);
+            return new SignerResponse($datas['id'], $datas['status']);
         } catch (YousignException $e) {
             $error = $e->getErrors();
             $error['member'] = [
@@ -159,7 +164,7 @@ class ClientYousign implements ClientInterface
                 'email' => $member->getEmail(),
                 'phone' => $member->getPhone(),
             ];
-            throw new ClientException('Error when adding signer', 400, $e, $error);
+            throw new ClientException('Error on sendSigner: '.json_encode($error), 400, $e, $error);
         }
     }
 
@@ -176,12 +181,12 @@ class ClientYousign implements ClientInterface
         $response = $this->request('POST', $uri, [
             'body' => json_encode(array_map(static fn ($follower) => $follower->toArray(), $followersArray), JSON_THROW_ON_ERROR),
         ]);
-
-        if (!is_array($response)) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas)) {
             throw new ApiException('Create follower error');
         }
 
-        return array_map(static fn ($follower) => new FollowerResponse($follower['email'], $follower['locale'], $follower['follower_link']), $response);
+        return array_map(static fn ($follower) => new FollowerResponse($follower['email'], $follower['locale'], $follower['follower_link']), $datas);
     }
 
     public function sendField(string $procedureId, string $signerId, string $documentId, Field $location): string
@@ -193,12 +198,12 @@ class ClientYousign implements ClientInterface
                 $location->toArray(),
             ), JSON_THROW_ON_ERROR),
         ]);
-
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ApiException('Create field error');
         }
 
-        return $response['id'];
+        return $datas['id'];
     }
 
     public function sendDocument(string $procedureId, Document $document): DocumentResponse
@@ -213,11 +218,12 @@ class ClientYousign implements ClientInterface
             'headers' => $header->toArray(),
             'body' => $formData->toIterable(),
         ]);
-        if (!is_array($responseYousign) || empty($responseYousign['id']) || !is_string($responseYousign['id'])) {
+        $datas = $responseYousign['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ClientException('Upload error', 500);
         }
 
-        return new DocumentResponse($responseYousign['id'], $responseYousign['total_pages'], DateUtils::toDatetime($responseYousign['created_at']));
+        return new DocumentResponse($datas['id'], $datas['total_pages'], DateUtils::toDatetime($datas['created_at']));
     }
 
     public function getProcedure(string $procedureId): SignatureResponse
@@ -227,23 +233,26 @@ class ClientYousign implements ClientInterface
         }
 
         $response = $this->request('GET', 'signature_requests/'.$procedureId);
-
-        if (!is_array($response) || empty($response)) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas) || empty($datas)) {
             throw new ApiException('Get procedure error');
         }
-
+        $rateLimit = $datas['rateLimit'] ?? null;
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id'])
-            ->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''))
-            ->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null)
-            ->setWorkspaceId($response['workspace_id'])
-            ->setStatus($response['status']);
+        $signatureResponse->setProcedureId($datas['id'])
+            ->setCreationDate(DateUtils::toDatetime($datas['created_at'] ?? ''))
+            ->setExpirationDate($datas['expiration_date'] ? DateUtils::toDatetime($datas['expiration_date']) : null)
+            ->setWorkspaceId($datas['workspace_id'])
+            ->setStatus($datas['status'])
+            ->setRateLimit($rateLimit ? new RateLimitDTO($rateLimit['limitHour'], $rateLimit['remainingHour'], $rateLimit['limitMinute'], $rateLimit['remainingMinute']) : null)
+        ;
 
-        foreach ($response['documents'] as $document) {
+        foreach ($datas['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
         }
 
-        $signers = $this->request('GET', "signature_requests/{$procedureId}/signers");
+        $resp = $this->request('GET', "signature_requests/{$procedureId}/signers");
+        $signers = $resp['datas'] ?? [];
         if (is_array($signers) && !empty($signers)) {
             foreach ($signers as $signer) {
                 $signatureResponse->addMember(new Member(
@@ -260,7 +269,7 @@ class ClientYousign implements ClientInterface
             }
         }
 
-        if ($decline = $response['decline_information'] ?? false) {
+        if ($decline = $datas['decline_information'] ?? false) {
             $declinedAt = $decline['declined_at'] ? DateUtils::toDatetime($decline['declined_at']) : null;
             $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $declinedAt));
         }
@@ -271,28 +280,29 @@ class ClientYousign implements ClientInterface
     public function activate(string $procedureId): SignatureResponse
     {
         $response = $this->request('POST', "signature_requests/{$procedureId}/activate");
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ApiException('Activate signature error', 500);
         }
 
         $signatureResponse = new SignatureResponse();
-        $signatureResponse->setProcedureId($response['id'])
-            ->setCreationDate(DateUtils::toDatetime($response['created_at'] ?? ''))
-            ->setExpirationDate($response['expiration_date'] ? DateUtils::toDatetime($response['expiration_date']) : null)
-            ->setWorkspaceId($response['workspace_id'])
-            ->setStatus($response['status']);
+        $signatureResponse->setProcedureId($datas['id'])
+            ->setCreationDate(DateUtils::toDatetime($datas['created_at'] ?? ''))
+            ->setExpirationDate($datas['expiration_date'] ? DateUtils::toDatetime($datas['expiration_date']) : null)
+            ->setWorkspaceId($datas['workspace_id'])
+            ->setStatus($datas['status']);
 
-        foreach ($response['documents'] as $document) {
+        foreach ($datas['documents'] as $document) {
             $signatureResponse->addDocument(new SignatureDocumentResponse(null, $document['id'], $document['nature']));
         }
 
-        if (is_array($response['signers']) && !empty($response['signers'])) {
-            foreach ($response['signers'] as $signer) {
+        if (is_array($datas['signers']) && !empty($datas['signers'])) {
+            foreach ($datas['signers'] as $signer) {
                 $signatureResponse->addMember(new Member(null, $signer['id'], $signer['status'], $signer['signature_link']));
             }
         }
 
-        if ($decline = $response['decline_information'] ?? false) {
+        if ($decline = $datas['decline_information'] ?? false) {
             $declinedAt = $decline['declined_at'] ? DateUtils::toDatetime($decline['declined_at']) : null;
             $signatureResponse->setDeclineInformation(new DeclineInformation($decline['reason'], $decline['signer_id'], $declinedAt));
         }
@@ -350,7 +360,8 @@ class ClientYousign implements ClientInterface
             [
                 'body' => json_encode(['reason' => $reason, 'custom_note' => $customNote], JSON_THROW_ON_ERROR),
             ]);
-        if (!is_array($response) || empty($response['id']) || !is_string($response['id'])) {
+        $datas = $response['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ApiException('Cancel signature error', 500);
         }
     }
@@ -379,37 +390,43 @@ class ClientYousign implements ClientInterface
             'headers' => $header->toArray(),
             'body' => $formData->toIterable(),
         ]);
-        if (!is_array($responseYousign) || empty($responseYousign['id']) || !is_string($responseYousign['id'])) {
+        $datas = $responseYousign['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
             throw new ClientException('Upload archiveDocument error', 500);
         }
 
-        return new DocumentResponse($responseYousign['id'], 0, DateUtils::toDatetime($responseYousign['created_at']));
+        return new DocumentResponse($datas['id'], 0, DateUtils::toDatetime($datas['created_at']));
     }
 
     /**
      * @param array<string, mixed> $options
      *
-     * @return array<mixed, mixed>|string
+     * @return array<mixed, mixed>
      */
-    public function request(string $method, string $url, array $options = [])
+    private function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
-
-        if (300 <= $response->getStatusCode()) {
-            $errors = $this->handleError($response->getContent(false));
-            if (429 === $response->getStatusCode()) {
-                throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement', $response->getStatusCode(), null, $errors);
+        $code = $response->getStatusCode();
+        $rateLimit = $this->getRateLimit($response->getHeaders(false));
+        $content = $response->getContent(false);
+        if (300 <= $code) {
+            $errors = $this->handleError($content);
+            if (429 === $code) {
+                throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement; '.$rateLimit->getRateLimitDetail(), $response->getStatusCode(), null, $errors);
             }
 
-            throw new ApiException($errors['message'] ?? 'ApiException', $response->getStatusCode(), null, $errors);
+            throw new ApiException($content, $response->getStatusCode(), null, $errors);
         }
 
-        if (($data = json_decode($response->getContent(false), true)) === null) {
+        if (($data = json_decode($content, true)) === null) {
             $errors = $this->handleError($response->getContent(false));
-            throw new ClientException($errors['message'] ?? 'ClientException', $response->getStatusCode(), null, $errors);
+            throw new ClientException($content, $response->getStatusCode(), null, $errors);
         }
 
-        return $data;
+        $datas['rateLimit'] = $rateLimit->toArray();
+        $datas['datas'] = $data;
+
+        return $datas;
     }
 
     /**
@@ -442,11 +459,11 @@ class ClientYousign implements ClientInterface
             'GET',
             "signature_requests/{$procedureId}/signers/{$signerId}/audit_trails",
         );
-
+        $datas = $response['datas'] ?? [];
         if (
             !is_array($response)
-            || !is_array($signer = $response['signer'] ?? false)
-            || !is_array($signatureRequest = $response['signature_request'] ?? false)
+            || !is_array($signer = $datas['signer'] ?? false)
+            || !is_array($signatureRequest = $datas['signature_request'] ?? false)
         ) {
             throw new ApiException('getAuditTrail error', 500);
         }
@@ -473,5 +490,20 @@ class ClientYousign implements ClientInterface
     public function checkRib(string $path): string
     {
         throw new ClientException("'checkRib' method is not implemented for this Yousing v3.", 501);
+    }
+
+    /** @param array<string, mixed> $headers */
+    private function getRateLimit(array $headers): RateLimitDTO
+    {
+        $getHeaderValue = function (string $header) use ($headers): ?int {
+            return isset($headers[$header][0]) ? (int) $headers[$header][0] : null;
+        };
+
+        $limitHour = $getHeaderValue('x-ratelimit-limit-hour');
+        $remainingHour = $getHeaderValue('x-ratelimit-remaining-hour');
+        $limitMinute = $getHeaderValue('x-ratelimit-limit-minute');
+        $remainingMinute = $getHeaderValue('x-ratelimit-remaining-minute');
+
+        return new RateLimitDTO($limitHour, $remainingHour, $limitMinute, $remainingMinute);
     }
 }

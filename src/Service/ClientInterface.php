@@ -91,7 +91,7 @@ interface ClientInterface
     public function getAuditTrail(string $procedureId, string $signerId): AuditResponse;
 
     /**
-     * Check RIB document
+     * Check RIB document.
      */
     public function checkRib(string $path): string;
 }
