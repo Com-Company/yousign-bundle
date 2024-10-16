@@ -43,6 +43,6 @@ class WebhookParser implements WebhookParserInterface
 
     public function getEventName(Request $request): string
     {
-        return (string) $request->request->get('event_name');
+        return (string) $request->toArray()['event_name'];
     }
 }
