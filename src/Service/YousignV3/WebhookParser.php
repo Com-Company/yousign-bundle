@@ -36,6 +36,7 @@ class WebhookParser implements WebhookParserInterface
             $signatureRequest['documents'] ?? [],
             $signatureRequest['workspace_id'] ?? null,
             $signatureRequest['external_id'] ?? null,
+            $data['data']['reason'] ?? null,
         );
 
         return $payload;

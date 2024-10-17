@@ -195,7 +195,7 @@ class ClientYousign implements ClientInterface
     {
         try {
             $responseYousign = $this->request('POST', 'check-document/bank_accounts', [
-                'body' => json_encode(['file' => base64_encode(file_get_contents($path))])
+                'body' => json_encode(['file' => base64_encode(file_get_contents($path))]),
             ]);
 
             return $responseYousign['extractedIban'] ?? '';
