@@ -12,6 +12,6 @@ class ClientException extends YousignException
      */
     public function __construct(string $message, int $code = 500, ?\Throwable $previous = null, array $errors = [])
     {
-        parent::__construct('Client Error: '.$message, $code, $previous, $errors);
+        parent::__construct($message, $code, $previous, $errors);
     }
 }

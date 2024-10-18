@@ -12,11 +12,14 @@ class ProcedureResponse
 
     private \DateTime $expirationDate;
 
-    public function __construct(string $id, string $status, \DateTime $expirationDate)
+    private ?RateLimit $rateLimit = null;
+
+    public function __construct(string $id, string $status, \DateTime $expirationDate, ?RateLimit $rateLimit = null)
     {
         $this->id = $id;
         $this->status = $status;
         $this->expirationDate = $expirationDate;
+        $this->rateLimit = $rateLimit;
     }
 
     public function getId(): string
@@ -32,5 +35,10 @@ class ProcedureResponse
     public function getExpirationDate(): ?\DateTime
     {
         return $this->expirationDate;
+    }
+
+    public function getRateLimit(): ?RateLimit
+    {
+        return $this->rateLimit;
     }
 }
