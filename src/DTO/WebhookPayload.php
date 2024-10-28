@@ -22,6 +22,8 @@ class WebhookPayload
 
     private ?string $declineReason;
 
+    private ?\DateTime $eventTime;
+
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
@@ -34,7 +36,8 @@ class WebhookPayload
         array $files = [],
         ?string $workspaceId = null,
         ?string $externalId = null,
-        ?string $declineReason = null
+        ?string $declineReason = null,
+        ?\DateTime $eventTime = null
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -44,6 +47,7 @@ class WebhookPayload
         $this->workspaceId = $workspaceId ?? null;
         $this->externalId = $externalId ?? null;
         $this->declineReason = $declineReason ?? null;
+        $this->eventTime = $eventTime ?? null;
     }
 
     public function getId(): string
@@ -90,6 +94,11 @@ class WebhookPayload
     public function getDeclineReason(): ?string
     {
         return $this->declineReason;
+    }
+
+    public function getEventTime(): ?\DateTime
+    {
+        return $this->eventTime;
     }
 
     /** @return array<string, mixed> */

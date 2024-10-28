@@ -28,6 +28,12 @@ class WebhookParser implements WebhookParserInterface
             throw new YousignException('signature_request[\'id\'] not found', 0, null, $data);
         }
 
+        $time = null;
+        if ($data['event_time'] ?? false) {
+            $time = new \DateTime();
+            $time->setTimestamp($data['event_time']);
+        }
+
         $payload = new WebhookPayload(
             $signatureRequest['id'],
             $data['event_name'] ?? '',
@@ -37,6 +43,7 @@ class WebhookParser implements WebhookParserInterface
             $signatureRequest['workspace_id'] ?? null,
             $signatureRequest['external_id'] ?? null,
             $data['data']['reason'] ?? null,
+            $time
         );
 
         return $payload;
