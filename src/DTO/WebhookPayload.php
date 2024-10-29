@@ -24,6 +24,8 @@ class WebhookPayload
 
     private ?\DateTime $eventTime;
 
+    /** @var array<string, mixed> */
+    private ?array $signer;
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
@@ -37,7 +39,8 @@ class WebhookPayload
         ?string $workspaceId = null,
         ?string $externalId = null,
         ?string $declineReason = null,
-        ?\DateTime $eventTime = null
+        ?\DateTime $eventTime = null,
+        ?array $signer = null
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -48,6 +51,7 @@ class WebhookPayload
         $this->externalId = $externalId ?? null;
         $this->declineReason = $declineReason ?? null;
         $this->eventTime = $eventTime ?? null;
+        $this->signer = $signer ?? null;
     }
 
     public function getId(): string
@@ -99,6 +103,12 @@ class WebhookPayload
     public function getEventTime(): ?\DateTime
     {
         return $this->eventTime;
+    }
+
+
+    public function getSigner(): ?array
+    {
+        return $this->signer;
     }
 
     /** @return array<string, mixed> */
