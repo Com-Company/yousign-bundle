@@ -26,6 +26,7 @@ class WebhookPayload
 
     /** @var array<string, mixed> */
     private ?array $signer;
+
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
@@ -104,7 +105,6 @@ class WebhookPayload
     {
         return $this->eventTime;
     }
-
 
     public function getSigner(): ?array
     {

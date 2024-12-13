@@ -226,6 +226,25 @@ class ClientYousign implements ClientInterface
         return new DocumentResponse($datas['id'], $datas['total_pages'], DateUtils::toDatetime($datas['created_at']));
     }
 
+    public function updateDocumentNature(string $procedureId, string $documentId, string $nature): DocumentResponse
+    {
+        $formData = new FormDataPart([
+            'nature' => $nature,
+        ]);
+        $header = $formData->getPreparedHeaders();
+        $responseYousign = $this->request('POST', 'signature_requests/'.$procedureId.'/documents/'.$documentId, [
+            'headers' => $header->toArray(),
+            'body' => $formData->toIterable(),
+        ]);
+
+        $datas = $responseYousign['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
+            throw new ClientException('Upload error', 500);
+        }
+
+        return new DocumentResponse($datas['id'], $datas['total_pages'], DateUtils::toDatetime($datas['created_at']));
+    }
+
     public function getProcedure(string $procedureId): SignatureResponse
     {
         if (!$procedureId) {
