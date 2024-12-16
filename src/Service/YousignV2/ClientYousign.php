@@ -69,6 +69,11 @@ class ClientYousign implements ClientInterface
         throw new ClientException("'sendDocument' method is no longer implemented for this Yousing v2.", 501);
     }
 
+    public function updateDocumentNature(string $procedureId, string $documentId, string $nature): DocumentResponse
+    {
+        throw new ClientException("'updateDocumentNature' method is no longer implemented for this Yousing v2.", 501);
+    }
+
     /**
      * @throws ClientException
      */

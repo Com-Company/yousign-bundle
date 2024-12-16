@@ -60,6 +60,11 @@ interface ClientInterface
     public function sendDocument(string $procedureId, Document $document): DocumentResponse;
 
     /**
+     * Update document nature.
+     */
+    public function updateDocumentNature(string $procedureId, string $documentId, string $nature): DocumentResponse;
+
+    /**
      * Activate procedure.
      */
     public function activate(string $procedureId): SignatureResponse;

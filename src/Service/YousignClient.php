@@ -68,6 +68,11 @@ class YousignClient implements ClientInterface
         return $this->getInstance($version)->sendDocument($procedureId, $document);
     }
 
+    public function updateDocumentNature(string $procedureId, string $documentId, string $nature, string $version = Versions::V3): DocumentResponse
+    {
+        return $this->getInstance($version)->updateDocumentNature($procedureId, $documentId, $nature);
+    }
+
     public function getProof(string $procedureId, string $signerId, string $version = Versions::V3): string
     {
         return $this->getInstance($version)->getProof($procedureId, $signerId);
