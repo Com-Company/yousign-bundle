@@ -8,20 +8,23 @@ class ProcedureConfig
 {
     public string $name;
 
-    /** @var array<string, mixed> */
+    /** @param array<string, mixed> $extraConfig */
     public array $extraConfig;
 
     public string $workspaceId;
 
-    /** @param array<string, mixed> $extraConfig */
+    public string $deliveryMode;
+
     public function __construct(
         string $name,
         string $workspaceId,
+        string $deliveryMode = 'none',
         array $extraConfig = []
     ) {
         $this->name = $name;
         $this->extraConfig = $extraConfig;
         $this->workspaceId = $workspaceId;
+        $this->deliveryMode = $deliveryMode;
     }
 
     /** @return array<string, mixed> */
@@ -31,7 +34,7 @@ class ProcedureConfig
             [
                 'name' => $this->name,
                 'workspace_id' => $this->workspaceId,
-                'delivery_mode' => 'none',
+                'delivery_mode' => $this->deliveryMode,
                 'signers_allowed_to_decline' => true,
                 'audit_trail_locale' => 'fr',
             ], $this->extraConfig);
