@@ -248,4 +248,9 @@ class ClientYousign implements ClientInterface
     {
         throw new ClientException("'auditTrail' method is not supported in Yousing v2.", 501);
     }
+
+    public function sendReminder(string $procedureId, string $signerId): void
+    {
+        throw new ClientException("'sendReminder' method is not supported in Yousing v2.", 501);
+    }
 }

@@ -525,4 +525,13 @@ class ClientYousign implements ClientInterface
 
         return new RateLimitDTO($limitHour, $remainingHour, $limitMinute, $remainingMinute);
     }
+
+    public function sendReminder(string $procedureId, string $signerId): void
+    {
+        $response = $this->httpClient->request('POST', "signature_requests/{$procedureId}/signers/{$signerId}/send_reminder");
+        if (300 <= $response->getStatusCode()) {
+            $errors = $this->handleError($response->getContent(false));
+            throw new ApiException('Error on sendReminder: '.$response->getContent(false), $response->getStatusCode(), null, $errors);
+        }
+    }
 }
