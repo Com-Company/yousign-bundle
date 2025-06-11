@@ -112,4 +112,9 @@ class YousignClient implements ClientInterface
     {
         return $this->getInstance($version)->checkRib($path);
     }
+
+    public function sendReminder(string $procedureId, string $signerId, string $version = Versions::V3): void
+    {
+        $this->getInstance($version)->sendReminder($procedureId, $signerId);
+    }
 }

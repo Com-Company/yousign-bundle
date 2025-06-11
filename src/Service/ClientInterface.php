@@ -99,4 +99,9 @@ interface ClientInterface
      * Check RIB document.
      */
     public function checkRib(string $path): string;
+
+    /**
+     * Send yousing SignReminder.
+     */
+    public function sendReminder(string $procedureId, string $signerId): void;
 }
