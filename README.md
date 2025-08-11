@@ -1,31 +1,14 @@
 # Yousign V3 Signature Interface
 Component Symfony pour signature Yousign V3
 
-Auteur : Andrei DACIN (adacin@com-company.fr); Valentin DO ESPIRITO SANTO (vdoespiritosanto@com-company.fr)
-## installation avec composer
-Les projets doivent avoir une dépendance de 
-```bash
-    "require": {
-      "com-company/symfony-contract-signature": "*",
-      "com-company/yousign-bundle": "*",
-    },
-     "repositories": [{
-        "type": "vcs",
-        "url": "https://github.com/Com-Company/yousign-bundle.git"
-    }, {
-        "type": "vcs",
-        "url": "https://github.com/Com-Company/symfony-contract-signature.git"
-    }],
-```
-
-Exécutez ensuite
+## Installation
 ```bash
 $ composer require com-company/yousign-bundle
 ```
 ## Configuration au sein de votre projet
-### 1 . Déclaration des varaible d'environnement
+### 1 . Déclaration des variables d'environnement
 
-
+```sh
     ###> yousign ###
     #dev URI = 'https://staging-api.yousign.com' 
     #prod URI = 'https://api.yousign.com'
@@ -41,9 +24,9 @@ $ composer require com-company/yousign-bundle
     YOUSIGN_V3_TOKEN=''
     YOUSIGN_V3_ACCESS_KEY='' #que si vous gérez les webhook yousign
     ###< yousign V3###
+```
 
-
-### 2. Si votre application va gerer lew webhooks 
+### 2. Si votre application va gerer les webhooks 
 
 #### 1. Créer un fichier yousign.yaml dans le dossier config/routes avec le contenu suivant:
 ```yaml
@@ -61,7 +44,7 @@ Pour chaque event que vous souhaitez écouter, créez une class implémentant Ev
 <?php
     interface EventHandlerInterface
     {
-    public function handle(WebhookPayload $payload): void;
+        public function handle(WebhookPayload $payload): void;
     
         public function onError(YousignException $e): void;
     }
@@ -79,6 +62,6 @@ Où event est le nom de l'event yousign à écouter et service est la méthode �
 
 la class déclarée avec default (default: 'App\Service\Signature\WebhookProcess') intercepte tous les events qui ne sont pas bindés 
 
-### 3.STATUS DE SIGNATURE/MEMBRES:
+### 3.STATUTS DE SIGNATURE/MEMBRES:
 
 Afin de préprarer la transition vers V3, le bundle ne renvoie que des statuts de Yousign V3, même pour les signatures initiées en V2. Chaque statut de V2 est mappé à un statut V3 correspondant.

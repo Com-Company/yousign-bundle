@@ -1,4 +1,4 @@
-FROM registry.valeur-et-capital.intra/commun/php:7.4-apache-buster as composer
+FROM php:7.4-apache as composer
 
 #dépendances Git
 RUN apt-get update && apt-get install -y zlib1g-dev libzip-dev zip unzip git
