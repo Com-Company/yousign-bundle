@@ -511,6 +511,34 @@ class ClientYousign implements ClientInterface
         throw new ClientException("'checkRib' method is not implemented for this Yousing v3.", 501);
     }
 
+    /** @return  array<string, mixed> */
+    public function checkIdentityDocument(Document $document, string $firstname, string $lastname, string $workspaceId, ?string $type = null): array
+    {
+        $file = new \SplFileInfo($document->getPath());
+        $params = [
+            'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
+            'first_name' => $firstname,
+            'last_name' => $lastname,
+            'workspace_id' => $workspaceId,
+        ];
+        if ($type) {
+            $params['type'] = $type;
+        }
+
+        $formData = new FormDataPart($params);
+        $header = $formData->getPreparedHeaders();
+        $responseYousign = $this->request('POST', 'verifications/identity_documents', [
+            'headers' => $header->toArray(),
+            'body' => $formData->toIterable(),
+        ]);
+        $datas = $responseYousign['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
+            throw new ClientException('Upload error', 500);
+        }
+
+        return $responseYousign['datas'];
+    }
+
     /** @param array<string, mixed> $headers */
     private function getRateLimit(array $headers): RateLimitDTO
     {

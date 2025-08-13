@@ -27,10 +27,14 @@ class WebhookPayload
     /** @var array<string, mixed> */
     private ?array $signer;
 
+    /** @var array<string, mixed> */
+    private array $rawData;
+
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
      * @param array<string, mixed>             $signer
+     * @param array<string, mixed>             $rawData
      */
     public function __construct(
         string $id,
@@ -42,7 +46,8 @@ class WebhookPayload
         ?string $externalId = null,
         ?string $declineReason = null,
         ?\DateTime $eventTime = null,
-        ?array $signer = null
+        ?array $signer = null,
+        array $rawData
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -54,6 +59,7 @@ class WebhookPayload
         $this->declineReason = $declineReason ?? null;
         $this->eventTime = $eventTime ?? null;
         $this->signer = $signer ?? null;
+        $this->rawData = $rawData;
     }
 
     public function getId(): string
@@ -113,6 +119,14 @@ class WebhookPayload
     public function getSigner(): ?array
     {
         return $this->signer;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRawData(): ?array
+    {
+        return $this->rawData;
     }
 
     /** @return array<string, mixed> */

@@ -19,14 +19,16 @@ class WebhookParser implements WebhookParserInterface
     public function parse(Request $request): WebhookPayload
     {
         $data = json_decode((string) $request->getContent(), true);
-        if (!($data['data']['signature_request'] ?? false)) {
+
+        if (!($data['data']['signature_request'] ?? false) && !($data['data']['identity_document'] ?? false)) {
             throw new YousignException('Invalid payload', 0, null, $data);
         }
 
-        $signatureRequest = $data['data']['signature_request'];
-        if (!($signatureRequest['id'] ?? false)) {
-            throw new YousignException('signature_request[\'id\'] not found', 0, null, $data);
+        $id = $data['data']['signature_request']['id'] ?? $data['data']['identity_document']['id'] ?? null;
+        if (!($id ?? false)) {
+            throw new YousignException('signature_request[\'id\'] or identity_document[\'id\'] not found', 0, null, $data);
         }
+        $requestData = $data['data']['signature_request'] ?? $data['data']['identity_document'] ?? null;
 
         $time = null;
         if ($data['event_time'] ?? false) {
@@ -34,20 +36,19 @@ class WebhookParser implements WebhookParserInterface
             $time->setTimestamp($data['event_time']);
         }
 
-        $payload = new WebhookPayload(
-            $signatureRequest['id'],
+        return new WebhookPayload(
+            $requestData['id'],
             $data['event_name'] ?? '',
-            $signatureRequest['status'] ?? '',
-            $signatureRequest['signers'] ?? [],
-            $signatureRequest['documents'] ?? [],
-            $signatureRequest['workspace_id'] ?? null,
-            $signatureRequest['external_id'] ?? null,
+            $requestData['status'] ?? '',
+            $requestData['signers'] ?? [],
+            $requestData['documents'] ?? [],
+            $requestData['workspace_id'] ?? null,
+            $requestData['external_id'] ?? null,
             $data['data']['reason'] ?? null,
             $time,
-            $data['data']['signer'] ?? null
+            $data['data']['signer'] ?? null,
+            $data
         );
-
-        return $payload;
     }
 
     public function getEventName(Request $request): string
