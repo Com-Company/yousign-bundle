@@ -62,6 +62,9 @@ Où event est le nom de l'event yousign à écouter et service est la méthode �
 
 la class déclarée avec default (default: 'App\Service\Signature\WebhookProcess') intercepte tous les events qui ne sont pas bindés 
 
+<ins>Remarque :</ins> La classe WebhookPayload est conçue pour porter les infos des évènements de type signature_request (les plus communs). 
+Si vous utilisez des évènements plus spécifiques (exemple : les évènements de vérifications de documents d'identité), le contenu du webhook sera contenu tel quel dans la propriété $rawData de WebhookPayload 
+
 ### 3.STATUTS DE SIGNATURE/MEMBRES:
 
 Afin de préprarer la transition vers V3, le bundle ne renvoie que des statuts de Yousign V3, même pour les signatures initiées en V2. Chaque statut de V2 est mappé à un statut V3 correspondant.
