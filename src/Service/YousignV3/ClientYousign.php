@@ -6,6 +6,7 @@ use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Follower;
+use ComCompany\YousignBundle\DTO\Initials;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
@@ -209,10 +210,20 @@ class ClientYousign implements ClientInterface
     public function sendDocument(string $procedureId, Document $document): DocumentResponse
     {
         $file = new \SplFileInfo($document->getPath());
-        $formData = new FormDataPart([
+        $formDataArray = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
             'nature' => $document->getNature(),
-        ]);
+        ];
+
+        $initials = $document->getInitials() instanceof Initials
+            ? $document->getInitials()->toArray()
+            : null;
+
+        if ($initials && is_array($initials) && isset($initials['alignment'], $initials['y'])) {
+            $formDataArray['initials'] = $initials;
+        }
+
+        $formData = new FormDataPart($formDataArray);
         $header = $formData->getPreparedHeaders();
         $responseYousign = $this->request('POST', 'signature_requests/'.$procedureId.'/documents', [
             'headers' => $header->toArray(),

@@ -11,14 +11,16 @@ class Document
     private string $nature;
     private ?string $id;
     private ?string $mimeType;
+    private ?Initials $initials;
 
-    public function __construct(string $name, string $path, string $nature = 'signable_document', ?string $mimeType = null, ?string $id = null)
+    public function __construct(string $name, string $path, string $nature = 'signable_document', ?string $mimeType = null, ?string $id = null, ?Initials $initials = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->nature = $nature;
         $this->path = $path;
         $this->mimeType = $mimeType;
+        $this->initials = $initials;
     }
 
     public function getId(): ?string
@@ -44,6 +46,11 @@ class Document
     public function getMimeType(): ?string
     {
         return $this->mimeType;
+    }
+
+    public function getInitials(): ?Initials
+    {
+        return $this->initials;
     }
 
     public function setName(string $name): Document
@@ -77,6 +84,13 @@ class Document
     public function setMimeType(?string $mimeType): Document
     {
         $this->mimeType = $mimeType;
+
+        return $this;
+    }
+
+    public function setInitials(?Initials $initials): Document
+    {
+        $this->initials = $initials;
 
         return $this;
     }
