@@ -378,6 +378,21 @@ class ClientYousign implements ClientInterface
         return $response->getContent(false);
     }
 
+    public function getProofs(string $procedureId): string
+    {
+        if (!$procedureId) {
+            throw new ClientException('procedureId is required');
+        }
+
+        $response = $this->httpClient->request('GET', "signature_requests/{$procedureId}/audit_trails/download");
+
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
+        }
+
+        return $response->getContent(false);
+    }
+
     public function cancelProcedure(string $procedureId, ?string $reason = null, ?string $customNote = null): void
     {
         if (!in_array($reason, self::CANCEL_REASONS, true)) {
