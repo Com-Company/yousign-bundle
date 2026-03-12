@@ -7,28 +7,29 @@ use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\WebhookParserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebhookParser implements WebhookParserInterface
+class WebhookBankAccountParser implements WebhookParserInterface
 {
     public function support(Request $request): bool
     {
         $version = $request->attributes->get('_route_params')['version'] ?? null;
 
-        return 'v3' === $version && $this->getEventName($request) !== 'verification.bank_account_lookup.done';
+        return 'v3' === $version && $this->getEventName($request) === 'verification.bank_account_lookup.done';
     }
 
     public function parse(Request $request): WebhookPayload
     {
         $data = json_decode((string) $request->getContent(), true);
 
-        if (!($data['data']['signature_request'] ?? false) && !($data['data']['identity_document'] ?? false)) {
+        if (!($data['data']['bank_account_lookup'] ?? false)) {
             throw new YousignException('Invalid payload', 0, null, $data);
         }
 
-        $id = $data['data']['signature_request']['id'] ?? $data['data']['identity_document']['id'] ?? null;
+        $requestData = $data['data']['bank_account_lookup'];
+
+        $id = $requestData['id'] ?? null;
         if (!($id ?? false)) {
-            throw new YousignException('signature_request[\'id\'] or identity_document[\'id\'] not found', 0, null, $data);
+            throw new YousignException('bank_account_lookup[\'id\'] not found', 0, null, $data);
         }
-        $requestData = $data['data']['signature_request'] ?? $data['data']['identity_document'] ?? null;
 
         $time = null;
         if ($data['event_time'] ?? false) {
@@ -47,7 +48,9 @@ class WebhookParser implements WebhookParserInterface
             $data['data']['reason'] ?? null,
             $time,
             $data['data']['signer'] ?? null,
-            $data
+            $data,
+            $requestData['extracted_from_document']['iban'],
+            $requestData['status_codes'] ?? null,
         );
     }
 
