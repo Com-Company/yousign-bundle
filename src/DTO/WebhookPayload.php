@@ -39,6 +39,7 @@ class WebhookPayload
      * @param array<int, array<string, mixed>> $files
      * @param array<string, mixed>             $signer
      * @param array<string, mixed>             $rawData
+     * @param array<string, mixed>|null        $statusCodes
      */
     public function __construct(
         string $id,

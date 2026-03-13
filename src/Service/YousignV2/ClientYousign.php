@@ -255,7 +255,7 @@ class ClientYousign implements ClientInterface
         throw new ClientException("'sendReminder' method is not supported in Yousing v2.", 501);
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturaPerson): string
+    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string
     {
         throw new ClientException("'startBankAccountVerificationFromFile' method is not available for Yousing v2.", 501);
     }

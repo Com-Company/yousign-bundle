@@ -119,8 +119,8 @@ class YousignClient implements ClientInterface
         $this->getInstance($version)->sendReminder($procedureId, $signerId);
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturaPerson, string $version = Versions::V3): string
+    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson, string $version = Versions::V3): string
     {
-        return $this->getInstance($version)->startBankAccountVerificationFromFile($document, $naturaPerson);
+        return $this->getInstance($version)->startBankAccountVerificationFromFile($document, $naturalPerson);
     }
 }

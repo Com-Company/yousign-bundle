@@ -106,5 +106,8 @@ interface ClientInterface
      */
     public function sendReminder(string $procedureId, string $signerId): void;
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturaPerson): string;
+    /**
+     * Start bank account verification from a file.
+     */
+    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string;
 }

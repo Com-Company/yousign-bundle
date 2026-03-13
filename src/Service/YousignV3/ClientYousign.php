@@ -590,12 +590,12 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturaPerson): string
+    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string
     {
         $file = new \SplFileInfo($document->getPath());
         $formData = new FormDataPart([
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
-            'natural_person' => $naturaPerson->toArray(),
+            'natural_person' => $naturalPerson->toArray(),
         ]);
 
         $header = $formData->getPreparedHeaders();

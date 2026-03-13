@@ -49,7 +49,7 @@ class WebhookBankAccountParser implements WebhookParserInterface
             $time,
             $data['data']['signer'] ?? null,
             $data,
-            $requestData['extracted_from_document']['iban'],
+            $requestData['extracted_from_document']['iban'] ?? null,
             $requestData['status_codes'] ?? null,
         );
     }
