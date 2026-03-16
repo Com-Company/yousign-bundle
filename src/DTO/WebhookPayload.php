@@ -30,11 +30,16 @@ class WebhookPayload
     /** @var array<string, mixed> */
     private array $rawData;
 
+    private ?string $iban;
+
+    private ?array $statusCodes;
+
     /**
      * @param array<int, array<string, mixed>> $members
      * @param array<int, array<string, mixed>> $files
      * @param array<string, mixed>             $signer
      * @param array<string, mixed>             $rawData
+     * @param array<string, mixed>|null        $statusCodes
      */
     public function __construct(
         string $id,
@@ -47,7 +52,9 @@ class WebhookPayload
         ?string $declineReason = null,
         ?\DateTime $eventTime = null,
         ?array $signer = null,
-        array $rawData = []
+        array $rawData = [],
+        ?string $iban = null,
+        ?array $statusCodes = null
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -60,6 +67,8 @@ class WebhookPayload
         $this->eventTime = $eventTime ?? null;
         $this->signer = $signer ?? null;
         $this->rawData = $rawData;
+        $this->iban = $iban ?? null;
+        $this->statusCodes = $statusCodes ?? null;
     }
 
     public function getId(): string
@@ -127,6 +136,16 @@ class WebhookPayload
     public function getRawData(): ?array
     {
         return $this->rawData;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function getStatusCodes(): ?array
+    {
+        return $this->statusCodes;
     }
 
     /** @return array<string, mixed> */

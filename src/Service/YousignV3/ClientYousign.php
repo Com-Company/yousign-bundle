@@ -9,6 +9,7 @@ use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Initials;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
+use ComCompany\YousignBundle\DTO\NaturalPerson;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
 use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
@@ -587,5 +588,22 @@ class ClientYousign implements ClientInterface
             $errors = $this->handleError($response->getContent(false));
             throw new ApiException('Error on sendReminder: '.$response->getContent(false), $response->getStatusCode(), null, $errors);
         }
+    }
+
+    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string
+    {
+        $file = new \SplFileInfo($document->getPath());
+        $formData = new FormDataPart([
+            'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
+            'natural_person' => $naturalPerson->toArray(),
+        ]);
+
+        $header = $formData->getPreparedHeaders();
+        $responseYousign = $this->request('POST', 'verifications/bank_account_lookups', [
+            'headers' => $header->toArray(),
+            'body' => $formData->toIterable(),
+        ]);
+
+        return $responseYousign['datas']['id'];
     }
 }
