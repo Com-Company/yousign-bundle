@@ -8,7 +8,6 @@ use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
-use ComCompany\YousignBundle\DTO\NaturalPerson;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
@@ -107,7 +106,14 @@ interface ClientInterface
     public function sendReminder(string $procedureId, string $signerId): void;
 
     /**
-     * Start bank account verification from a file.
+     * Start bank account document verification.
+     * @param Document $document
+     * @param string|null $bic
+     * @param string|null $iban
+     *
+     * @return string verification id
      */
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string;
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string;
+
+    public function getBankAccountDocVerification(string $verificationId): string;
 }

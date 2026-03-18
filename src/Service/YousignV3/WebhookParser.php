@@ -13,7 +13,7 @@ class WebhookParser implements WebhookParserInterface
     {
         $version = $request->attributes->get('_route_params')['version'] ?? null;
 
-        return 'v3' === $version && $this->getEventName($request) !== 'verification.bank_account_lookup.done';
+        return 'v3' === $version && $this->getEventName($request) !== 'verification.bank_account.done';
     }
 
     public function parse(Request $request): WebhookPayload

@@ -8,7 +8,6 @@ use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
-use ComCompany\YousignBundle\DTO\NaturalPerson;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
@@ -255,8 +254,13 @@ class ClientYousign implements ClientInterface
         throw new ClientException("'sendReminder' method is not supported in Yousing v2.", 501);
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string
     {
-        throw new ClientException("'startBankAccountVerificationFromFile' method is not available for Yousing v2.", 501);
+        throw new ClientException("'startBankAccountDocVerification' method is not available for Yousing v2.", 501);
+    }
+
+    public function getBankAccountDocVerification(string $verificationId): string
+    {
+        throw new ClientException("'getBankAccountDocVerification' method is not available for Yousing v2.", 501);
     }
 }

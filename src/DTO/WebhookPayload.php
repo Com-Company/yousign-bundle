@@ -29,9 +29,6 @@ class WebhookPayload
 
     /** @var array<string, mixed> */
     private array $rawData;
-
-    private ?string $iban;
-
     private ?array $statusCodes;
 
     /**
@@ -53,7 +50,6 @@ class WebhookPayload
         ?\DateTime $eventTime = null,
         ?array $signer = null,
         array $rawData = [],
-        ?string $iban = null,
         ?array $statusCodes = null
     ) {
         $this->id = $id;
@@ -67,7 +63,6 @@ class WebhookPayload
         $this->eventTime = $eventTime ?? null;
         $this->signer = $signer ?? null;
         $this->rawData = $rawData;
-        $this->iban = $iban ?? null;
         $this->statusCodes = $statusCodes ?? null;
     }
 
@@ -136,11 +131,6 @@ class WebhookPayload
     public function getRawData(): ?array
     {
         return $this->rawData;
-    }
-
-    public function getIban(): ?string
-    {
-        return $this->iban;
     }
 
     public function getStatusCodes(): ?array

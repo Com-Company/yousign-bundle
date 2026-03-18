@@ -9,7 +9,6 @@ use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Initials;
 use ComCompany\YousignBundle\DTO\Member as MemberDTO;
 use ComCompany\YousignBundle\DTO\MemberConfig;
-use ComCompany\YousignBundle\DTO\NaturalPerson;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\ProcedureConfig as ProcedureConfigYousign;
 use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
@@ -590,20 +589,43 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson): string
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string
     {
         $file = new \SplFileInfo($document->getPath());
         $formData = new FormDataPart([
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
-            'natural_person' => $naturalPerson->toArray(),
         ]);
 
+        if ($iban) {
+            $formData->addPart(new DataPart($iban, 'iban'));
+        }
+
+        if ($bic) {
+            $formData->addPart(new DataPart($bic, 'bic'));
+        }
+
         $header = $formData->getPreparedHeaders();
-        $responseYousign = $this->request('POST', 'verifications/bank_account_lookups', [
+        $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
             'headers' => $header->toArray(),
             'body' => $formData->toIterable(),
         ]);
 
-        return $responseYousign['datas']['id'];
+        $datas = $responseYousign['datas'] ?? [];
+        if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
+            throw new ClientException('Error starting bank account document verification', 500);
+        }
+
+        return $datas['id'];
+    }
+
+    public function getBankAccountDocVerification(string $verificationId): string
+    {
+        $response = $this->httpClient->request('GET', "verifications/bank_accounts/{$verificationId}");
+
+        if (300 <= $response->getStatusCode()) {
+            throw new ApiException('Error Processing Request: '.$response->getContent(false), $response->getStatusCode());
+        }
+
+        return $response->getContent(false);
     }
 }
