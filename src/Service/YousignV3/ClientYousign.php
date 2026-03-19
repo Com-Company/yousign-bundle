@@ -592,17 +592,19 @@ class ClientYousign implements ClientInterface
     public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string
     {
         $file = new \SplFileInfo($document->getPath());
-        $formData = new FormDataPart([
+        $params = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
-        ]);
+        ];
 
-        if ($iban) {
-            $formData->addPart(new DataPart($iban, 'iban'));
+        if ($iban !== null) {
+            $params['iban'] = $iban;
         }
 
-        if ($bic) {
-            $formData->addPart(new DataPart($bic, 'bic'));
+        if ($bic !== null) {
+            $params['bic'] = $bic;
         }
+
+        $formData = new FormDataPart($params);
 
         $header = $formData->getPreparedHeaders();
         $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
