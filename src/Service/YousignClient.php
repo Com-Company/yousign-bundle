@@ -9,7 +9,6 @@ use ComCompany\YousignBundle\DTO\FieldsLocations;
 use ComCompany\YousignBundle\DTO\Follower;
 use ComCompany\YousignBundle\DTO\Member;
 use ComCompany\YousignBundle\DTO\MemberConfig;
-use ComCompany\YousignBundle\DTO\NaturalPerson;
 use ComCompany\YousignBundle\DTO\ProcedureConfig;
 use ComCompany\YousignBundle\DTO\Response\Audit\AuditResponse;
 use ComCompany\YousignBundle\DTO\Response\DocumentResponse;
@@ -119,8 +118,13 @@ class YousignClient implements ClientInterface
         $this->getInstance($version)->sendReminder($procedureId, $signerId);
     }
 
-    public function startBankAccountVerificationFromFile(Document $document, NaturalPerson $naturalPerson, string $version = Versions::V3): string
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, string $version = Versions::V3): string
     {
-        return $this->getInstance($version)->startBankAccountVerificationFromFile($document, $naturalPerson);
+        return $this->getInstance($version)->startBankAccountDocVerification($document, $iban, $bic);
+    }
+
+    public function getBankAccountDocVerification(string $verificationId, string $version = Versions::V3): string
+    {
+        return $this->getInstance($version)->getBankAccountDocVerification($verificationId);
     }
 }

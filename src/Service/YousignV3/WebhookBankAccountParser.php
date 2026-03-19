@@ -13,22 +13,22 @@ class WebhookBankAccountParser implements WebhookParserInterface
     {
         $version = $request->attributes->get('_route_params')['version'] ?? null;
 
-        return 'v3' === $version && $this->getEventName($request) === 'verification.bank_account_lookup.done';
+        return 'v3' === $version && $this->getEventName($request) === 'verification.bank_account.done';
     }
 
     public function parse(Request $request): WebhookPayload
     {
         $data = json_decode((string) $request->getContent(), true);
 
-        if (!($data['data']['bank_account_lookup'] ?? false)) {
+        if (!($data['data']['bank_account'] ?? false)) {
             throw new YousignException('Invalid payload', 0, null, $data);
         }
 
-        $requestData = $data['data']['bank_account_lookup'];
+        $requestData = $data['data']['bank_account'];
 
         $id = $requestData['id'] ?? null;
         if (!($id ?? false)) {
-            throw new YousignException('bank_account_lookup[\'id\'] not found', 0, null, $data);
+            throw new YousignException('bank_account[\'id\'] not found', 0, null, $data);
         }
 
         $time = null;
@@ -49,7 +49,6 @@ class WebhookBankAccountParser implements WebhookParserInterface
             $time,
             $data['data']['signer'] ?? null,
             $data,
-            $requestData['extracted_from_document']['iban'] ?? null,
             $requestData['status_codes'] ?? null,
         );
     }
