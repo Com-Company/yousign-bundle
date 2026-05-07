@@ -3,6 +3,7 @@
 namespace ComCompany\YousignBundle\Service;
 
 use ComCompany\YousignBundle\Constants\Versions;
+use ComCompany\YousignBundle\DTO\BankAccountOwner;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
@@ -118,9 +119,9 @@ class YousignClient implements ClientInterface
         $this->getInstance($version)->sendReminder($procedureId, $signerId);
     }
 
-    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, string $version = Versions::V3): string
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null, string $version = Versions::V3): string
     {
-        return $this->getInstance($version)->startBankAccountDocVerification($document, $iban, $bic);
+        return $this->getInstance($version)->startBankAccountDocVerification($document, $iban, $bic, $owner);
     }
 
     public function getBankAccountDocVerification(string $verificationId, string $version = Versions::V3): string
