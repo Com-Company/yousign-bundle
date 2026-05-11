@@ -2,6 +2,7 @@
 
 namespace ComCompany\YousignBundle\Service\YousignV3;
 
+use ComCompany\YousignBundle\DTO\BankAccountOwner;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
@@ -589,8 +590,12 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string
-    {
+    public function startBankAccountDocVerification(
+        Document $document,
+        ?string $iban = null,
+        ?string $bic = null,
+        ?BankAccountOwner $owner = null
+    ): string {
         $file = new \SplFileInfo($document->getPath());
         $params = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
@@ -602,6 +607,10 @@ class ClientYousign implements ClientInterface
 
         if ($bic !== null) {
             $params['bic'] = $bic;
+        }
+
+        if ($owner !== null) {
+            $params = array_merge($params, $owner->toArray());
         }
 
         $formData = new FormDataPart($params);

@@ -2,6 +2,7 @@
 
 namespace ComCompany\YousignBundle\Service;
 
+use ComCompany\YousignBundle\DTO\BankAccountOwner;
 use ComCompany\YousignBundle\DTO\Document;
 use ComCompany\YousignBundle\DTO\Field\Field;
 use ComCompany\YousignBundle\DTO\FieldsLocations;
@@ -113,7 +114,7 @@ interface ClientInterface
      *
      * @return string verification id
      */
-    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null): string;
+    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null): string;
 
     public function getBankAccountDocVerification(string $verificationId): string;
 }
