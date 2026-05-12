@@ -24,7 +24,7 @@ class SignatureDateField extends Field
         int $y,
         int $page,
         ?Font $font = null,
-        ?string $dateFormat = null,
+        ?string $dateFormat = 'dd/MM/yyyy',
         ?string $timeFormat = null
     )
     {
