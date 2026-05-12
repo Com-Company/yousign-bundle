@@ -23,13 +23,12 @@ class SignatureDateField extends Field
         int $x,
         int $y,
         int $page,
-        string $type,
         ?Font $font = null,
         ?string $dateFormat = null,
         ?string $timeFormat = null
     )
     {
-        parent::__construct($page, $type);
+        parent::__construct($page, 'signature_date');
         $this->x = $x;
         $this->y = $y;
         $this->font = $font;
