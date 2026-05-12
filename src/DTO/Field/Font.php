@@ -18,7 +18,7 @@ class Font
     /** @var int Font size value between 7 and 96 */
     public int $size;
 
-    public ?FontVariant $variants = null;
+    public ?FontVariant $variants;
 
     public function __construct(
         string $family,
@@ -30,7 +30,7 @@ class Font
         $this->family = $family;
         $this->color = $color;
         $this->size = $size;
-        $this->variants = $variants;
+        $this->variants = $variants ?? new FontVariant();
     }
 
     /** @return array<string, mixed> */
