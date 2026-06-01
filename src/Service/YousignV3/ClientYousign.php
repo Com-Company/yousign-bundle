@@ -25,6 +25,7 @@ use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ApiRateLimitException;
 use ComCompany\YousignBundle\Exception\ClientException;
+use ComCompany\YousignBundle\Exception\TranslatedException;
 use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
 use ComCompany\YousignBundle\Service\Utils\DateUtils;
@@ -448,6 +449,8 @@ class ClientYousign implements ClientInterface
      * @param array<string, mixed> $options
      *
      * @return array<mixed, mixed>
+     * @throws ClientException
+     * @throws ApiException
      */
     private function request(string $method, string $url, array $options = [])
     {
@@ -616,10 +619,14 @@ class ClientYousign implements ClientInterface
         $formData = new FormDataPart($params);
 
         $header = $formData->getPreparedHeaders();
-        $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
-            'headers' => $header->toArray(),
-            'body' => $formData->toIterable(),
-        ]);
+        try {
+            $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
+                'headers' => $header->toArray(),
+                'body' => $formData->toIterable(),
+            ]);
+        } catch (\Throwable $e) {
+            throw new TranslatedException($e->getMessage(), $e->getCode(), $e, $e->getErrors());
+        }
 
         $datas = $responseYousign['datas'] ?? [];
         if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {
