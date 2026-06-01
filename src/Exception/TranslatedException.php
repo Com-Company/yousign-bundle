@@ -58,10 +58,6 @@ class TranslatedException extends YousignException
             => 'La largeur de l\'image est trop petite ($1). La largeur minimale attendue est de $2.',
             '/^.*image height is too small.*?(\d+px).*?(\d+px).*$/i'
             => 'La hauteur de l\'image est trop petite ($1). La hauteur minimale attendue est de $2.',
-            '/^.*must not be blank.*$/i'
-            => 'Ce champ ne peut pas être vide.',
-            '/^.*is not a valid.*$/i'
-            => 'La valeur fournie n\'est pas valide.',
             '/^.*file.*too large.*$/i'
             => 'Le fichier est trop volumineux.',
             '/^.*file.*too small.*$/i'
