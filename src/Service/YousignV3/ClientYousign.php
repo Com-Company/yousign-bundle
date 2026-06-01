@@ -451,6 +451,7 @@ class ClientYousign implements ClientInterface
      * @return array<mixed, mixed>
      * @throws ClientException
      * @throws ApiException
+     * @throws ApiRateLimitException
      */
     private function request(string $method, string $url, array $options = [])
     {
@@ -458,9 +459,9 @@ class ClientYousign implements ClientInterface
         $code = $response->getStatusCode();
         $rateLimit = $this->getRateLimit($response->getHeaders(false));
         $content = $response->getContent(false);
-        if (300 <= $code) {
+        if ($code >= 300) {
             $errors = $this->handleError($content);
-            if (429 === $code) {
+            if ($code === 429) {
                 throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement; '.$rateLimit->getRateLimitDetail(), $response->getStatusCode(), null, $errors);
             }
 
@@ -593,6 +594,12 @@ class ClientYousign implements ClientInterface
         }
     }
 
+    /**
+     * @throws ApiException
+     * @throws ClientException
+     * @throws ApiRateLimitException
+     * @throws TranslatedException
+     */
     public function startBankAccountDocVerification(
         Document $document,
         ?string $iban = null,
@@ -624,8 +631,12 @@ class ClientYousign implements ClientInterface
                 'headers' => $header->toArray(),
                 'body' => $formData->toIterable(),
             ]);
-        } catch (\Throwable $e) {
-            throw new TranslatedException($e->getMessage(), $e->getCode(), $e, $e->getErrors());
+        } catch (ApiException|ClientException|ApiRateLimitException $e) {
+            if (TranslatedException::isTranslatable($e->getErrors())) {
+                throw new TranslatedException($e->getMessage(), $e->getCode(), $e, $e->getErrors());
+            }
+
+            throw $e;
         }
 
         $datas = $responseYousign['datas'] ?? [];

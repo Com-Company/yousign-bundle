@@ -15,7 +15,7 @@ class TranslatedException extends YousignException
         array $errors = [],
         ?string $originalMessage = null
     ) {
-        parent::__construct($this->getTranslatedMessage($errors, $previous), $code, $previous, $errors);
+        parent::__construct($this->getTranslatedMessage($errors), $code, $previous, $errors);
         $this->originalMessage = $originalMessage ?? $message;
     }
 
@@ -29,17 +29,9 @@ class TranslatedException extends YousignException
         $this->originalMessage = $originalMessage;
     }
 
-    private function getTranslatedMessage(array $errors, ?\Throwable $previous = null): string
+    private function getTranslatedMessage(array $errors): string
     {
         $invalidParams = $errors['errors'] ?? [];
-
-        if ($previous && get_class($previous) !== ApiException::class) {
-            return 'Une erreur est survenue lors de votre demande.';
-        }
-
-        if (!isset($errors['message']) || $errors['message'] !== 'You have some invalid params in your payload.') {
-            return 'Une erreur est survenue lors de votre demande.';
-        }
 
         if (empty($invalidParams)) {
             return 'Votre demande contient des paramètres invalides.';
@@ -89,5 +81,17 @@ class TranslatedException extends YousignException
         }
 
         return $reason;
+    }
+
+    public static function isTranslatable(array $errors): bool
+    {
+        $isTranslatable = false;
+        foreach ($errors['errors'] ?? [] as $param) {
+            if (self::translateReason($param['reason'] ?? '') !== $param['reason']) {
+                $isTranslatable = true;
+                break;
+            }
+        }
+        return $isTranslatable;
     }
 }
