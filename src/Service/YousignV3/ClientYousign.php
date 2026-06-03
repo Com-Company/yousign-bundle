@@ -459,7 +459,7 @@ class ClientYousign implements ClientInterface
         $code = $response->getStatusCode();
         $rateLimit = $this->getRateLimit($response->getHeaders(false));
         $content = $response->getContent(false);
-        if (300 <= $code) {
+        if ($code >= 300) {
             $errors = $this->handleError($content);
             if (429 === $code) {
                 throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement; '.$rateLimit->getRateLimitDetail(), $response->getStatusCode(), null, $errors);
