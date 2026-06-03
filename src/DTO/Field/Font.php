@@ -8,7 +8,7 @@ class Font
 {
     /**
      * @var string Font family value between 'Inconsolata', 'Open Sans', 'Lato', 'Raleway', 'Merriweather',
-     * 'EB Garamond', 'Comic Neue', 'Monaco', 'Helvetica', 'Courier' or 'Times Roman'
+     *             'EB Garamond', 'Comic Neue', 'Monaco', 'Helvetica', 'Courier' or 'Times Roman'
      */
     public string $family;
 
@@ -24,9 +24,8 @@ class Font
         string $family,
         string $color,
         int $size,
-        ?FontVariant $variants = null
-    )
-    {
+        ?FontVariant $variants = null,
+    ) {
         $this->family = $family;
         $this->color = $color;
         $this->size = $size;

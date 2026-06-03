@@ -34,7 +34,7 @@ class Member
         array $fields = [],
         array $extraConfig = [],
         ?MemberConfig $config = null,
-        ?string $id = null
+        ?string $id = null,
     ) {
         $this->id = $id;
         $this->firstName = $firstName;

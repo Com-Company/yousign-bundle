@@ -25,6 +25,7 @@ use ComCompany\YousignBundle\DTO\Response\SignerResponse;
 use ComCompany\YousignBundle\Exception\ApiException;
 use ComCompany\YousignBundle\Exception\ApiRateLimitException;
 use ComCompany\YousignBundle\Exception\ClientException;
+use ComCompany\YousignBundle\Exception\TranslatedException;
 use ComCompany\YousignBundle\Exception\YousignException;
 use ComCompany\YousignBundle\Service\ClientInterface;
 use ComCompany\YousignBundle\Service\Utils\DateUtils;
@@ -448,6 +449,10 @@ class ClientYousign implements ClientInterface
      * @param array<string, mixed> $options
      *
      * @return array<mixed, mixed>
+     *
+     * @throws ClientException
+     * @throws ApiException
+     * @throws ApiRateLimitException
      */
     private function request(string $method, string $url, array $options = [])
     {
@@ -455,7 +460,7 @@ class ClientYousign implements ClientInterface
         $code = $response->getStatusCode();
         $rateLimit = $this->getRateLimit($response->getHeaders(false));
         $content = $response->getContent(false);
-        if (300 <= $code) {
+        if ($code >= 300) {
             $errors = $this->handleError($content);
             if (429 === $code) {
                 throw new ApiRateLimitException('Limite d\'appels atteinte, merci de réessayer ultérieurement; '.$rateLimit->getRateLimitDetail(), $response->getStatusCode(), null, $errors);
@@ -590,36 +595,50 @@ class ClientYousign implements ClientInterface
         }
     }
 
+    /**
+     * @throws ApiException
+     * @throws ClientException
+     * @throws ApiRateLimitException
+     * @throws TranslatedException
+     */
     public function startBankAccountDocVerification(
         Document $document,
         ?string $iban = null,
         ?string $bic = null,
-        ?BankAccountOwner $owner = null
+        ?BankAccountOwner $owner = null,
     ): string {
         $file = new \SplFileInfo($document->getPath());
         $params = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
         ];
 
-        if ($iban !== null) {
+        if (null !== $iban) {
             $params['iban'] = $iban;
         }
 
-        if ($bic !== null) {
+        if (null !== $bic) {
             $params['bic'] = $bic;
         }
 
-        if ($owner !== null) {
+        if (null !== $owner) {
             $params = array_merge($params, $owner->toArray());
         }
 
         $formData = new FormDataPart($params);
 
         $header = $formData->getPreparedHeaders();
-        $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
-            'headers' => $header->toArray(),
-            'body' => $formData->toIterable(),
-        ]);
+        try {
+            $responseYousign = $this->request('POST', 'verifications/bank_accounts', [
+                'headers' => $header->toArray(),
+                'body' => $formData->toIterable(),
+            ]);
+        } catch (ApiException|ClientException|ApiRateLimitException $e) {
+            if (TranslatedException::isTranslatable($e->getErrors())) {
+                throw new TranslatedException($e->getMessage(), $e->getCode(), $e, $e->getErrors());
+            }
+
+            throw $e;
+        }
 
         $datas = $responseYousign['datas'] ?? [];
         if (!is_array($datas) || empty($datas['id']) || !is_string($datas['id'])) {

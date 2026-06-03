@@ -108,9 +108,6 @@ interface ClientInterface
 
     /**
      * Start bank account document verification.
-     * @param Document $document
-     * @param string|null $iban
-     * @param string|null $bic
      *
      * @return string verification id
      */

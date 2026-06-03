@@ -29,6 +29,8 @@ class WebhookPayload
 
     /** @var array<string, mixed> */
     private array $rawData;
+
+    /** @var array<string, mixed>|null */
     private ?array $statusCodes;
 
     /**
@@ -50,7 +52,7 @@ class WebhookPayload
         ?\DateTime $eventTime = null,
         ?array $signer = null,
         array $rawData = [],
-        ?array $statusCodes = null
+        ?array $statusCodes = null,
     ) {
         $this->id = $id;
         $this->eventName = $eventName;
@@ -133,6 +135,9 @@ class WebhookPayload
         return $this->rawData;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getStatusCodes(): ?array
     {
         return $this->statusCodes;
