@@ -29,6 +29,9 @@ class TranslatedException extends YousignException
         $this->originalMessage = $originalMessage;
     }
 
+    /**
+     * @param array{errors?: array<int, array<string, mixed>>} $errors
+     */
     private function getTranslatedMessage(array $errors): string
     {
         $invalidParams = $errors['errors'] ?? [];
@@ -73,6 +76,9 @@ class TranslatedException extends YousignException
         return $reason;
     }
 
+    /**
+     * @param array{errors?: array<int, array<string, mixed>>} $errors
+     */
     public static function isTranslatable(array $errors): bool
     {
         $isTranslatable = false;

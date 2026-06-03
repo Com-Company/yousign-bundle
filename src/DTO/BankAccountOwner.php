@@ -32,6 +32,10 @@ class BankAccountOwner
             return ['natural_person' => $this->naturalPerson->toArray()];
         }
 
-        return ['legal_person' => $this->legalPerson->toArray()];
+        if (null !== $this->legalPerson) {
+            return ['legal_person' => $this->legalPerson->toArray()];
+        }
+
+        throw new \LogicException('BankAccountOwner must contain either a natural or legal person.');
     }
 }
