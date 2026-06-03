@@ -12,9 +12,8 @@ class FontVariant
 
     public function __construct(
         bool $italic = false,
-        bool $bold = false
-    )
-    {
+        bool $bold = false,
+    ) {
         $this->italic = $italic;
         $this->bold = $bold;
     }

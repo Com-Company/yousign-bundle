@@ -12,7 +12,7 @@ class SignatureDateField extends Field
 
     /**
      * @var string|null Date format value between 'dd/MM/yyyy', 'dd-MM-yyyy', 'dd.MM.yyyy', 'yyyy-MM-dd',
-     *  'MM/dd/yyyy', 'dd MMMM yyyy', 'MMMM dd, yyyy' or 'MMM dd, yyyy'
+     *                  'MM/dd/yyyy', 'dd MMMM yyyy', 'MMMM dd, yyyy' or 'MMM dd, yyyy'
      */
     public ?string $dateFormat = null;
 
@@ -25,9 +25,8 @@ class SignatureDateField extends Field
         int $page,
         ?Font $font = null,
         ?string $dateFormat = 'dd/MM/yyyy',
-        ?string $timeFormat = null
-    )
-    {
+        ?string $timeFormat = null,
+    ) {
         parent::__construct($page, 'signature_date');
         $this->x = $x;
         $this->y = $y;

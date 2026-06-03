@@ -13,7 +13,7 @@ class TranslatedException extends YousignException
         int $code = 0,
         ?\Throwable $previous = null,
         array $errors = [],
-        ?string $originalMessage = null
+        ?string $originalMessage = null,
     ) {
         parent::__construct($this->getTranslatedMessage($errors), $code, $previous, $errors);
         $this->originalMessage = $originalMessage ?? $message;
@@ -42,7 +42,8 @@ class TranslatedException extends YousignException
             static function (array $param) use (&$first) {
                 $prefix = $first ? '' : '- ';
                 $first = false;
-                return $prefix . self::translateReason($param['reason'] ?? '');
+
+                return $prefix.self::translateReason($param['reason'] ?? '');
             },
             $invalidParams
         );
@@ -54,20 +55,13 @@ class TranslatedException extends YousignException
     {
         $translations = [
             // verification compte bancaires
-            '/^.*image width is too small.*?(\d+px).*?(\d+px).*$/i'
-            => 'La largeur de l\'image est trop petite ($1). La largeur minimale attendue est de $2.',
-            '/^.*image height is too small.*?(\d+px).*?(\d+px).*$/i'
-            => 'La hauteur de l\'image est trop petite ($1). La hauteur minimale attendue est de $2.',
-            '/^.*file.*too large.*$/i'
-            => 'Le fichier est trop volumineux.',
-            '/^.*file.*too small.*$/i'
-            => 'Le fichier est trop petit.',
-            '/^.*invalid.*format.*$/i'
-            => 'Le format du fichier est invalide.',
-            '/^.*too many pixels.*?(\d+).*?(\d+).*$/i'
-            => 'L\'image contient trop de pixels ($1). Le nombre maximum attendu est de $2.',
-            '/^.*Please upload a valid extension.*$/i'
-            => 'Format du fichier invalide, veuillez utiliser un des formats suivants: PDF, JPG, JPEG ou PNG.',
+            '/^.*image width is too small.*?(\d+px).*?(\d+px).*$/i' => 'La largeur de l\'image est trop petite ($1). La largeur minimale attendue est de $2.',
+            '/^.*image height is too small.*?(\d+px).*?(\d+px).*$/i' => 'La hauteur de l\'image est trop petite ($1). La hauteur minimale attendue est de $2.',
+            '/^.*file.*too large.*$/i' => 'Le fichier est trop volumineux.',
+            '/^.*file.*too small.*$/i' => 'Le fichier est trop petit.',
+            '/^.*invalid.*format.*$/i' => 'Le format du fichier est invalide.',
+            '/^.*too many pixels.*?(\d+).*?(\d+).*$/i' => 'L\'image contient trop de pixels ($1). Le nombre maximum attendu est de $2.',
+            '/^.*Please upload a valid extension.*$/i' => 'Format du fichier invalide, veuillez utiliser un des formats suivants: PDF, JPG, JPEG ou PNG.',
         ];
 
         foreach ($translations as $pattern => $replacement) {
@@ -88,6 +82,7 @@ class TranslatedException extends YousignException
                 break;
             }
         }
+
         return $isTranslatable;
     }
 }

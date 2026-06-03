@@ -28,7 +28,7 @@ class BankAccountOwner
     /** @return array<string, mixed> */
     public function toArray(): array
     {
-        if ($this->naturalPerson !== null) {
+        if (null !== $this->naturalPerson) {
             return ['natural_person' => $this->naturalPerson->toArray()];
         }
 

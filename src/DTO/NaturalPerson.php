@@ -30,7 +30,7 @@ class NaturalPerson
     {
         return [
             'first_name' => $this->firstName,
-            'last_name'  => $this->lastName,
+            'last_name' => $this->lastName,
         ];
     }
 }

@@ -449,6 +449,7 @@ class ClientYousign implements ClientInterface
      * @param array<string, mixed> $options
      *
      * @return array<mixed, mixed>
+     *
      * @throws ClientException
      * @throws ApiException
      * @throws ApiRateLimitException
@@ -604,22 +605,22 @@ class ClientYousign implements ClientInterface
         Document $document,
         ?string $iban = null,
         ?string $bic = null,
-        ?BankAccountOwner $owner = null
+        ?BankAccountOwner $owner = null,
     ): string {
         $file = new \SplFileInfo($document->getPath());
         $params = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
         ];
 
-        if ($iban !== null) {
+        if (null !== $iban) {
             $params['iban'] = $iban;
         }
 
-        if ($bic !== null) {
+        if (null !== $bic) {
             $params['bic'] = $bic;
         }
 
-        if ($owner !== null) {
+        if (null !== $owner) {
             $params = array_merge($params, $owner->toArray());
         }
 
