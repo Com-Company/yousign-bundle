@@ -25,7 +25,7 @@ class SignatureDateField extends Field
         int $page,
         ?Font $font = null,
         ?string $dateFormat = 'dd/MM/yyyy',
-        ?string $timeFormat = null,
+        ?string $timeFormat = null
     ) {
         parent::__construct($page, 'signature_date');
         $this->x = $x;

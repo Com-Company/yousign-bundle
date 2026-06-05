@@ -425,14 +425,21 @@ class ClientYousign implements ClientInterface
         }
     }
 
-    public function archiveDocument(string $workspaceId, Document $document): DocumentResponse
+    /** @param array<int, string> $meta */
+    public function archiveDocument(string $workspaceId, Document $document, bool $archiveY = false, array $meta = []): DocumentResponse
     {
         $file = new \SplFileInfo($document->getPath());
-        $formData = new FormDataPart([
+        $formDataArray = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
             'workspace_id' => $workspaceId,
-        ]);
+            'archive_y' => $archiveY ? 'true' : 'false',
+        ];
+        if (is_array($meta) && !empty($meta)) {
+            $formDataArray['tags'] = $meta;
+        }
+        $formData = new FormDataPart($formDataArray);
         $header = $formData->getPreparedHeaders();
+
         $responseYousign = $this->request('POST', 'archives', [
             'headers' => $header->toArray(),
             'body' => $formData->toIterable(),
@@ -605,7 +612,7 @@ class ClientYousign implements ClientInterface
         Document $document,
         ?string $iban = null,
         ?string $bic = null,
-        ?BankAccountOwner $owner = null,
+        ?BankAccountOwner $owner = null
     ): string {
         $file = new \SplFileInfo($document->getPath());
         $params = [
