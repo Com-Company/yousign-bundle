@@ -42,7 +42,7 @@ class Member
         ?string $firstname = null,
         ?string $lastname = null,
         ?string $email = null,
-        ?string $phone = null,
+        ?string $phone = null
     ) {
         $this->id = $id;
         $this->supplierId = $supplierId;

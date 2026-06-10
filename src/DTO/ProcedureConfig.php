@@ -17,7 +17,7 @@ class ProcedureConfig
     public function __construct(
         string $name,
         string $workspaceId,
-        array $extraConfig = [],
+        array $extraConfig = []
     ) {
         $this->name = $name;
         $this->extraConfig = $extraConfig;

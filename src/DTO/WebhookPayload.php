@@ -52,7 +52,7 @@ class WebhookPayload
         ?\DateTime $eventTime = null,
         ?array $signer = null,
         array $rawData = [],
-        ?array $statusCodes = null,
+        ?array $statusCodes = null
     ) {
         $this->id = $id;
         $this->eventName = $eventName;

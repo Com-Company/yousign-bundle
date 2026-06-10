@@ -13,7 +13,7 @@ class TranslatedException extends YousignException
         int $code = 0,
         ?\Throwable $previous = null,
         array $errors = [],
-        ?string $originalMessage = null,
+        ?string $originalMessage = null
     ) {
         parent::__construct($this->getTranslatedMessage($errors), $code, $previous, $errors);
         $this->originalMessage = $originalMessage ?? $message;

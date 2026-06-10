@@ -24,7 +24,7 @@ class Font
         string $family,
         string $color,
         int $size,
-        ?FontVariant $variants = null,
+        ?FontVariant $variants = null
     ) {
         $this->family = $family;
         $this->color = $color;
