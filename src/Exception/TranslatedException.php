@@ -15,7 +15,14 @@ class TranslatedException extends YousignException
         array $errors = [],
         ?string $originalMessage = null
     ) {
-        parent::__construct($this->getTranslatedMessage($errors), $code, $previous, $errors);
+        $errors['message'] = self::translateReason($errors['message'] ?? '');
+
+        foreach ($errors['errors'] ?? [] as $key => $param) {
+            $errors['errors'][$key]['reason'] = self::translateReason($param['reason'] ?? '');
+        }
+
+        parent::__construct($this->formatTranslatedMessage($errors), $code, $previous, $errors);
+
         $this->originalMessage = $originalMessage ?? $message;
     }
 
@@ -32,7 +39,7 @@ class TranslatedException extends YousignException
     /**
      * @param array{errors?: array<int, array<string, mixed>>} $errors
      */
-    private function getTranslatedMessage(array $errors): string
+    private function formatTranslatedMessage(array $errors): string
     {
         $invalidParams = $errors['errors'] ?? [];
 
@@ -46,7 +53,7 @@ class TranslatedException extends YousignException
                 $prefix = $first ? '' : '- ';
                 $first = false;
 
-                return $prefix.self::translateReason($param['reason'] ?? '');
+                return $prefix.$param['reason'];
             },
             $invalidParams
         );
@@ -58,6 +65,7 @@ class TranslatedException extends YousignException
     {
         $translations = [
             // verification compte bancaires
+            '/^.*You have some invalid params in your payload.*$/i' => 'Vous avez des paramètres invalides dans votre demande.',
             '/^.*image width is too small.*?(\d+px).*?(\d+px).*$/i' => 'La largeur de l\'image est trop petite ($1). La largeur minimale attendue est de $2.',
             '/^.*image height is too small.*?(\d+px).*?(\d+px).*$/i' => 'La hauteur de l\'image est trop petite ($1). La hauteur minimale attendue est de $2.',
             '/^.*file.*too large.*$/i' => 'Le fichier est trop volumineux.',
