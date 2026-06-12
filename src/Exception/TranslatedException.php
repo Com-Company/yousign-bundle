@@ -62,6 +62,8 @@ class TranslatedException extends YousignException
             '/^.*image height is too small.*?(\d+px).*?(\d+px).*$/i' => 'La hauteur de l\'image est trop petite ($1). La hauteur minimale attendue est de $2.',
             '/^.*file.*too large.*$/i' => 'Le fichier est trop volumineux.',
             '/^.*file.*too small.*$/i' => 'Le fichier est trop petit.',
+            '/^.*invalid IBAN format.*$/i' => 'Le format de l\'IBAN est invalide.',
+            '/^.*invalid BIC format.*$/i' => 'Le format du BIC est invalide.',
             '/^.*invalid.*format.*$/i' => 'Le format du fichier est invalide.',
             '/^.*too many pixels.*?(\d+).*?(\d+).*$/i' => 'L\'image contient trop de pixels ($1). Le nombre maximum attendu est de $2.',
             '/^.*Please upload a valid extension.*$/i' => 'Format du fichier invalide, veuillez utiliser un des formats suivants: PDF, JPG, JPEG ou PNG.',
