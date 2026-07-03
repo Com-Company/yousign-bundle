@@ -11,8 +11,8 @@ class NaturalPerson
 
     public function __construct(string $firstName, string $lastName)
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+        $this->firstName = str_replace('&', 'et', $firstName);
+        $this->lastName  = str_replace('&', 'et', $lastName);
     }
 
     public function getFirstName(): string
