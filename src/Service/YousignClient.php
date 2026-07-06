@@ -119,9 +119,9 @@ class YousignClient implements ClientInterface
         $this->getInstance($version)->sendReminder($procedureId, $signerId);
     }
 
-    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null, string $version = Versions::V3): string
+    public function startBankAccountDocVerification(Document $document, string $workspaceId, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null, string $version = Versions::V3): string
     {
-        return $this->getInstance($version)->startBankAccountDocVerification($document, $iban, $bic, $owner);
+        return $this->getInstance($version)->startBankAccountDocVerification($document, $workspaceId, $iban, $bic, $owner);
     }
 
     public function getBankAccountDocVerification(string $verificationId, string $version = Versions::V3): string

@@ -610,6 +610,7 @@ class ClientYousign implements ClientInterface
      */
     public function startBankAccountDocVerification(
         Document $document,
+        string $workspaceId,
         ?string $iban = null,
         ?string $bic = null,
         ?BankAccountOwner $owner = null
@@ -617,6 +618,7 @@ class ClientYousign implements ClientInterface
         $file = new \SplFileInfo($document->getPath());
         $params = [
             'file' => DataPart::fromPath($file->getPathname(), $document->getName(), $document->getMimeType()),
+            'workspace_id' => $workspaceId,
         ];
 
         if (null !== $iban) {

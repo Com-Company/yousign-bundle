@@ -111,7 +111,7 @@ interface ClientInterface
      *
      * @return string verification id
      */
-    public function startBankAccountDocVerification(Document $document, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null): string;
+    public function startBankAccountDocVerification(Document $document, string $workspaceId, ?string $iban = null, ?string $bic = null, ?BankAccountOwner $owner = null): string;
 
     public function getBankAccountDocVerification(string $verificationId): string;
 }
