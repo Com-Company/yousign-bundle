@@ -17,7 +17,9 @@ use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
+#[AsTaggedItem('key')]
 class YousignClient implements ClientInterface
 {
     /** @var ClientInterface[] */
