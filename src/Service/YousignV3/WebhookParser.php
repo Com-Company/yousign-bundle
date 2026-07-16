@@ -47,7 +47,8 @@ class WebhookParser implements WebhookParserInterface
             $data['data']['reason'] ?? null,
             $time,
             $data['data']['signer'] ?? null,
-            $data
+            $data,
+            $requestData['status_codes'] ?? null,
         );
     }
 
