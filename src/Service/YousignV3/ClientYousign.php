@@ -426,7 +426,7 @@ class ClientYousign implements ClientInterface
     }
 
     /** @param array<int, string> $meta */
-    public function archiveDocument(string $workspaceId, Document $document, bool $archiveY = false, array $meta = []): DocumentResponse
+    public function archiveDocument(string $workspaceId, Document $document, bool $archiveY = false, array $meta = [], ?string $metas = null): DocumentResponse
     {
         $file = new \SplFileInfo($document->getPath());
         $formDataArray = [
@@ -437,6 +437,10 @@ class ClientYousign implements ClientInterface
         if (is_array($meta) && !empty($meta)) {
             $formDataArray['tags'] = $meta;
         }
+        if (!is_null($metas)) {
+            $formDataArray['tags'] = $metas;
+        }
+
         $formData = new FormDataPart($formDataArray);
         $header = $formData->getPreparedHeaders();
 
@@ -461,7 +465,7 @@ class ClientYousign implements ClientInterface
      * @throws ApiException
      * @throws ApiRateLimitException
      */
-    private function request(string $method, string $url, array $options = [])
+    protected function request(string $method, string $url, array $options = [])
     {
         $response = $this->httpClient->request($method, $url, $options);
         $code = $response->getStatusCode();
