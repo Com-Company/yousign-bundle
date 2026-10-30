@@ -15,7 +15,6 @@ services:
         public: false
         bind:
             $webhookParsers: !tagged_iterator 'yousign.webhook_parser'
-            $clientImplementations: !tagged_iterator 'yousign.client_implementation'
 
     _instanceof:
         ComCompany\YousignBundle\Service\WebhookParserInterface:

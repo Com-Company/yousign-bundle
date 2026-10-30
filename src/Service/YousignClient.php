@@ -17,16 +17,15 @@ use ComCompany\YousignBundle\DTO\Response\FollowerResponse;
 use ComCompany\YousignBundle\DTO\Response\ProcedureResponse;
 use ComCompany\YousignBundle\DTO\Response\Signature\SignatureResponse;
 use ComCompany\YousignBundle\DTO\Response\SignerResponse;
-use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-#[AsTaggedItem('key')]
 class YousignClient implements ClientInterface
 {
     /** @var ClientInterface[] */
     private array $implementations;
 
     /** @param iterable<ClientInterface> $clientImplementations */
-    public function __construct(iterable $clientImplementations)
+    public function __construct(#[AutowireIterator('yousign.client_implementation', indexAttribute:'key')] iterable $clientImplementations)
     {
         $this->implementations = $clientImplementations instanceof \Traversable ? iterator_to_array($clientImplementations) : (array) $clientImplementations;
     }
